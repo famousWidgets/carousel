@@ -5,19 +5,73 @@ define(function(require, exports, module) {
     var Engine = require('famous/core/Engine');
     var ImageSurface = require('famous/surfaces/ImageSurface');
     var StateModifier = require('famous/modifiers/StateModifier');
+    var Surface = require('famous/core/Surface');
+    var Scrollview = require('famous/views/Scrollview');
+    var Utility = require('famous/utilities/Utility');
 
     // create the main context
     var mainContext = Engine.createContext();
 
-    // your app here
-    var logo = new ImageSurface({
-        size: [200, 200],
-        content: 'content/images/famous_logo.png'
+
+
+    // create surface
+    var testSurface = new Surface({
+        size : [100, 100],
+        properties: {
+            backgroundColor: 'red'
+        }
     });
 
-    var logoModifier = new StateModifier({
-        origin: [0.5, 0.5]
+    var testSurface2 = new Surface({
+        size : [100, 100],
+        properties: {
+            backgroundColor: 'blue'
+        }
     });
 
-    mainContext.add(logoModifier).add(logo);
+        var testSurface3 = new Surface({
+        size : [100, 100],
+        properties: {
+            backgroundColor: 'black'
+        }
+    });
+
+            var testSurface4 = new Surface({
+        size : [100, 100],
+        properties: {
+            backgroundColor: 'yellow'
+        }
+    });
+
+    var testSurface5 = new Surface({
+        size : [100, 100],
+        properties: {
+            backgroundColor: 'gray'
+        }
+    });
+
+
+    var testSurface6 = new Surface({
+        size : [100, 100],
+        properties: {
+            backgroundColor: 'green'
+        }
+    });
+
+    testSurface3.on('click', function () {
+        scrollView.goToNextPage();
+    });
+
+
+    var testArray = [testSurface, testSurface2, testSurface3, testSurface4, testSurface5, testSurface6 ];
+
+
+    var scrollView = new Scrollview({
+        direction: Utility.Direction.X
+    });
+
+    scrollView.sequenceFrom(testArray);
+    
+    mainContext.add(scrollView);
+
 });
