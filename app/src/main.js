@@ -15,6 +15,8 @@ define(function(require, exports, module) {
     var Transform = require('famous/core/Transform');
     var View = require('famous/core/View');
 
+    var ScrollItemView = require('./views/ScrollItemView');
+
     /* SETUP */
 
     // contains all surfaces - to be used with scrollView
