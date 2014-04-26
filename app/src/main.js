@@ -1,3 +1,8 @@
+/*
+  plan: 
+    create wave effect
+*/
+
 /*globals define*/
 define(function(require, exports, module) {
     'use strict';
@@ -8,6 +13,9 @@ define(function(require, exports, module) {
     var Surface = require('famous/core/Surface');
     var Scrollview = require('famous/views/Scrollview');
     var Utility = require('famous/utilities/Utility');
+    var RenderNode = require('famous/core/RenderNode');
+    var Transform = require('famous/core/Transform');
+    var View = require('famous/core/View');
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -25,7 +33,7 @@ define(function(require, exports, module) {
 
     // create surface
     function createSurface (color, size) {
-        var testSurface = new Surface({
+        var surface = new Surface({
             size : [size, size],
             properties: {
                 backgroundColor: color
@@ -33,14 +41,41 @@ define(function(require, exports, module) {
         });
 
         // addings events
-        addEvent('click', testSurface);
+        var surfaceModifier = new StateModifier();
+        var sizeModifier = new StateModifier({
+            size: [size, size]
+        });
+        // var renderNode = new RenderNode(surfaceModifier);
+        var renderNode = new RenderNode();
+
+        renderNode.add(sizeModifier).add(surfaceModifier).add(surface);
+
+        // var view = new View();
+
+
+        surface.modifier = surfaceModifier;
+        surface.sizeModifier = sizeModifier;
         
-        return testSurface;
+        addEvent('click', surface, renderNode);
+
+        // return view.add(surfaceModifier).add(surface);
+        // console.log('rn size: ', renderNode.getSize());
+        return renderNode;
     }
 
     function addEvent (listener, surface, cb) {
         surface.on(listener, function (e) {
+            console.log('scroll init pos: ', scrollView.getPosition());
             scrollView.goToNextPage();
+            surface.modifier.setTransform(
+                Transform.scale(2,2,1),
+                {duration: 1000} 
+            );
+            surface.sizeModifier.setSize([200, 200], {duration: 1000});
+            // console.log('rn size: ', cb.getSize());
+            console.log('scroll getPosition: ', scrollView.getPosition());
+            // console.log('scroll setPosition: ', scrollView.setPosition(2));
+
         });
     }
 
@@ -51,10 +86,14 @@ define(function(require, exports, module) {
         }
     });
 
+    var modifier = new StateModifier();
 
-    // testSurface3.on('click', function () {
-    //     scrollView.goToNextPage();
-    // });
+
+    testSurface.on('click', function () {
+        scrollView.goToNextPage();
+    });
+
+    mainContext.add(testSurface);
 
     createSurfaceArray(4, surfaces, 100);
 
@@ -62,10 +101,14 @@ define(function(require, exports, module) {
         direction: Utility.Direction.X
     });
 
+    var scrollViewModifier = new StateModifier({
+        origin: [0, 0.5]
+    });
+
     scrollView.sequenceFrom(surfaces);
     
     mainContext.setPerspective(500);
-    mainContext.add(scrollView);
+    mainContext.add(scrollViewModifier).add(scrollView);
 
 });
 
