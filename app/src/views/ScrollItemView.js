@@ -11,8 +11,11 @@ define(function(require, exports, module) {
      * @description
      */
 
-    var ScrollItemView = function () {
+    var ScrollItemView = function (color, size) {
         View.apply(this, arguments);
+        
+        this.color = color;
+        this.size = size;
         
         // modifiers must be called first
         addSizeModifier.call(this);
@@ -27,23 +30,13 @@ define(function(require, exports, module) {
     ScrollItemView.DEFAULT_OPTIONS = {
         xScale: 2,
         yScale: 2,
-        scaleDuration: 1000
-    };
-
-    var addSurface = function (color, size) {
-        this.surface = new Surface({
-            size : [size, size],
-            properties: {
-                backgroundColor: color
-            }
-        });
-
-        addListener.call(this.surface);
+        scaleDuration: 1000,
+        listener: 'click'
     };
 
     var addSizeModifier = function () {
         this.sizeModifier = new StateModifier({
-            size: [size, size]
+            size: [this.size, this.size]
         });
     };
 
@@ -51,17 +44,30 @@ define(function(require, exports, module) {
         this.stateModifier = new StateModifier();
     };
 
-    var addListener = function () {
-        // 'this' will be surface
-        this.stateModifier.setTransform(
-            Transform.scale(xScale, yScale, 1),
-            { duration: scaleDuration } 
-        );
+    var addSurface = function () {
+        this.surface = new Surface({
+            size : [this.size, this.size],
+            properties: {
+                backgroundColor: this.color
+            }
+        });
 
-        this.sizeModifier.setSize(
-            [this.getSize()[0].xScale, this.getSize()[1].yScale],
-            { duration: scaleDuration }
-        );
+        this.surface.on(this.options.listener, function () {
+            this.stateModifier.setTransform(
+                Transform.scale(this.options.xScale, this.options.yScale, 1),
+                { duration: this.options.scaleDuration } 
+            );
+
+            this.sizeModifier.setSize(
+                [this.surface.getSize()[0] * this.options.xScale, this.surface.getSize()[1] * this.options.yScale],
+                { duration: this.options.scaleDuration }
+            );            
+        }.bind(this));
+
+        this.surface.pipe(this._eventOutput);
+
+        // add everything together
+        this.add(this.sizeModifier).add(this.stateModifier).add(this.surface);
     };
 
     module.exports = ScrollItemView;
