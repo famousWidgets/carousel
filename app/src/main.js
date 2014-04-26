@@ -6,9 +6,7 @@
 /*globals define*/
 define(function(require, exports, module) {
     'use strict';
-    // import dependencies
     var Engine = require('famous/core/Engine');
-    var ImageSurface = require('famous/surfaces/ImageSurface');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Surface = require('famous/core/Surface');
     var Scrollview = require('famous/views/Scrollview');
@@ -17,22 +15,13 @@ define(function(require, exports, module) {
     var Transform = require('famous/core/Transform');
     var View = require('famous/core/View');
 
-    // create the main context
-    var mainContext = Engine.createContext();
+    /* SETUP */
 
+    // contains all surfaces - to be used with scrollView
     var surfaces = [];
 
-    // create an array of surfaces 
-    function createSurfaceArray(n, arr, size) {
-        for (var i = 0; i < n; i++) {
-            var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var surface = createSurface(color, size);
-            surfaces.push(surface);
-        }
-    }
-
     // create surface
-    function createSurface (color, size) {
+    var createSurface = function (color, size) {
         var surface = new Surface({
             size : [size, size],
             properties: {
@@ -40,63 +29,69 @@ define(function(require, exports, module) {
             }
         });
 
-        // addings events
+        // adding modifiers
         var surfaceModifier = new StateModifier();
         var sizeModifier = new StateModifier({
             size: [size, size]
         });
-        // var renderNode = new RenderNode(surfaceModifier);
-        var renderNode = new RenderNode();
 
+        // creating a render node as an intermediary
+        var renderNode = new RenderNode();
         renderNode.add(sizeModifier).add(surfaceModifier).add(surface);
 
         // var view = new View();
 
-
+        // exposing modifiers on the surface
         surface.modifier = surfaceModifier;
         surface.sizeModifier = sizeModifier;
         
-        addEvent('click', surface, renderNode);
+        // adding events
+        addEvent('click', surface);
 
         // return view.add(surfaceModifier).add(surface);
         // console.log('rn size: ', renderNode.getSize());
         return renderNode;
-    }
+    };
 
-    function addEvent (listener, surface, cb) {
+    // create an array of surfaces 
+    var createSurfaceArray = function (num, size) {
+        for (var i = 0; i < num; i++) {
+            var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
+            var surface = createSurface(color, size);
+
+            // surfaces is closure-scoped
+            surfaces.push(surface);
+        }
+    };
+
+    var addEvent = function (listener, surface) {
         surface.on(listener, function (e) {
-            console.log('scroll init pos: ', scrollView.getPosition());
+            // console.log('scroll init pos: ', scrollView.getPosition());
+
+            // scrollView is closure-scoped
             scrollView.goToNextPage();
+
             surface.modifier.setTransform(
                 Transform.scale(2,2,1),
                 {duration: 1000} 
             );
+
             surface.sizeModifier.setSize([200, 200], {duration: 1000});
-            // console.log('rn size: ', cb.getSize());
             console.log('scroll getPosition: ', scrollView.getPosition());
-            // console.log('scroll setPosition: ', scrollView.setPosition(2));
-
         });
-    }
-
-    var testSurface = new Surface({
-        size : [100, 100],
-        properties: {
-            backgroundColor: 'red'
-        }
-    });
+    };
 
     var modifier = new StateModifier();
 
+    /* MAIN */
 
-    testSurface.on('click', function () {
-        scrollView.goToNextPage();
-    });
+    // create main context
+    var mainContext = Engine.createContext();
 
-    mainContext.add(testSurface);
+    // create surface and append to surfaces array
+    createSurfaceArray(4, 100);
 
-    createSurfaceArray(4, surfaces, 100);
-
+    // create scrollview
     var scrollView = new Scrollview({
         direction: Utility.Direction.X
     });
@@ -109,41 +104,4 @@ define(function(require, exports, module) {
     
     mainContext.setPerspective(500);
     mainContext.add(scrollViewModifier).add(scrollView);
-
 });
-
-    // var testSurface2 = new Surface({
-    //     size : [100, 100],
-    //     properties: {
-    //         backgroundColor: 'blue'
-    //     }
-    // });
-
-    //     var testSurface3 = new Surface({
-    //     size : [100, 100],
-    //     properties: {
-    //         backgroundColor: 'black'
-    //     }
-    // });
-
-    //         var testSurface4 = new Surface({
-    //     size : [100, 100],
-    //     properties: {
-    //         backgroundColor: 'yellow'
-    //     }
-    // });
-
-    // var testSurface5 = new Surface({
-    //     size : [100, 100],
-    //     properties: {
-    //         backgroundColor: 'gray'
-    //     }
-    // });
-
-
-    // var testSurface6 = new Surface({
-    //     size : [100, 100],
-    //     properties: {
-    //         backgroundColor: 'green'
-    //     }
-    // });
