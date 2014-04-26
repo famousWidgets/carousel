@@ -28,8 +28,8 @@ define(function(require, exports, module) {
     ScrollItemView.prototype.constructor = ScrollItemView;
 
     ScrollItemView.DEFAULT_OPTIONS = {
-        xScale: 2,
-        yScale: 2,
+        xScaleUp: 2,
+        yScaleUp: 2,
         scaleDuration: 1000,
         listener: 'click'
     };
@@ -54,14 +54,14 @@ define(function(require, exports, module) {
 
         this.surface.on(this.options.listener, function () {
             this.stateModifier.setTransform(
-                Transform.scale(this.options.xScale, this.options.yScale, 1),
+                Transform.scale(this.options.xScaleUp, this.options.yScaleUp, 1),
                 { duration: this.options.scaleDuration } 
             );
 
             this.sizeModifier.setSize(
-                [this.surface.getSize()[0] * this.options.xScale, this.surface.getSize()[1] * this.options.yScale],
+                [this.surface.getSize()[0] * this.options.xScaleUp, this.surface.getSize()[1] * this.options.yScaleUp],
                 { duration: this.options.scaleDuration }
-            );            
+            );
         }.bind(this));
 
         this.surface.pipe(this._eventOutput);

@@ -46,13 +46,8 @@ define(function(require, exports, module) {
         origin: [0, 0.5]
     });
 
-    // var draggable = new Draggable({
-    //     xRange: [-220, 220],
-    //     yRange: [0, 0]
-    // });
-
     // populate scrollItemViews array
-    createScrollItemArray(4, 100);
+    createScrollItemArray(100, 100);
     scrollView.sequenceFrom(scrollItemViews);
 
     mainContext.setPerspective(500);
