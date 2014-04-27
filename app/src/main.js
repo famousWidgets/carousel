@@ -1,8 +1,3 @@
-/*
-  plan: 
-    create wave effect
-*/
-
 /*globals define*/
 define(function(require, exports, module) {
     'use strict';
@@ -14,18 +9,22 @@ define(function(require, exports, module) {
     var RenderNode = require('famous/core/RenderNode');
     var Transform = require('famous/core/Transform');
     var View = require('famous/core/View');
-    var Draggable = require('famous/modifiers/Draggable');
 
     var ScrollItemView = require('./views/ScrollItemView');
 
     var createScrollItemArray = function (num, size) {
         for (var i = 0; i < num; i += 1) {
             var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var scrollItemView = new ScrollItemView(color, size);
+            var scrollItemView = new ScrollItemView(color, size, i);
 
             // surfaces is closure-scoped
             scrollItemViews.push(scrollItemView);
+
+            // each scrollItemView sending info to scrollView            
             scrollView.subscribe(scrollItemView._eventOutput);
+
+            // scrollView sending info to each scrollItemView
+            scrollView.pipe(scrollItemView._eventInput);
         }
     };
 
@@ -52,4 +51,12 @@ define(function(require, exports, module) {
 
     mainContext.setPerspective(500);
     mainContext.add(scrollViewModifier).add(scrollView);
+
+    scrollView._eventInput.on('update', function () {
+        // send information to each scrollViewItem
+        scrollView._eventOutput.emit('message', {
+            'offset': scrollView.getPosition(),
+            'screenSize': scrollView.getSize()
+        });
+    });
 });
