@@ -32,7 +32,7 @@ define(function(require, exports, module) {
         // var i = 0; // --> for testing purposes
         this._eventInput.on('message', function (data) {
             if (this.surface._matrix !== null) { //  && (i++ % 50 === 0) --> for testing purposes
-                var surfaceMidpoint = -data.offset + this.surface._matrix[12] + this.sizeModifier.getSize()[0] / 2;
+                var surfaceMidpoint = -Math.floor(data.offset) + this.surface._matrix[12] + Math.floor(this.sizeModifier.getSize()[0]/2);
                 var scalingFactor = calculateScalingFactor(data.screenSize[0], 1, 2, surfaceMidpoint);
                 this.stateModifier.setTransform(
                     Transform.scale(scalingFactor, scalingFactor, 1)
@@ -123,10 +123,17 @@ define(function(require, exports, module) {
     var calculateScalingFactor = function (screenWidth, startingScale, endingScale, xPosition) {
         var midpoint = screenWidth / 2;
 
-        if (xPosition <= midpoint) {
+        // from 0 to midpoint
+        if (xPosition <= midpoint && xPosition >= 0) {
             return ((endingScale - startingScale) / midpoint) * xPosition + startingScale;
-        } else {
+        } 
+        // from midpoint to screenWidth
+        else if (xPosition > midpoint && xPosition <= screenWidth){
             return (-(endingScale - startingScale) / midpoint) * xPosition + (2 * (endingScale - startingScale) + startingScale);
+        }
+        // when its offscreen
+        else {
+            return startingScale;
         }
     };
 
