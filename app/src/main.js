@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
     /* CONFIGURATION OPTIONS */
     var OPTIONS = {
-        direction: Utility.Direction.Y,
+        direction: 'Y',
         paginated: false,
         numItems: 100,
         surfaceSize: 50,
@@ -32,18 +32,18 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
 
     var scrollView = new Scrollview({
-        direction: OPTIONS.direction,
+        direction: Utility.Direction[OPTIONS.direction],
         paginated: OPTIONS.paginated
     });
 
     var scrollViewModifier = new StateModifier({
-        origin: OPTIONS.originY
+        origin: (OPTIONS.direction === 'X' ? OPTIONS.originX : OPTIONS.originY)
     });
 
     var createScrollItemArray = function (num, size) {
         for (var i = 0; i < num; i += 1) {
-            var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var scrollItemView = new ScrollItemView(color, size);
+            var color = 'hsl(' + (i * 360 / 10) + ', 100%, 50%)';
+            var scrollItemView = new ScrollItemView(color, size, OPTIONS.direction);
 
             // surfaces is closure-scoped
             scrollItemViews.push(scrollItemView);
