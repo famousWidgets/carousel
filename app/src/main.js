@@ -36,6 +36,22 @@ define(function(require, exports, module) {
         paginated: OPTIONS.paginated
     });
 
+    function carousel(offset) {
+        var direction = this.options.direction;
+        var vector = [0, 0, 0];
+        vector[direction] = offset;
+
+        var scaleVector = [1, 1, 1];
+
+        scaleVector[1] = 1 + (offset * 0.005);
+
+        var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
+
+        return transform;
+    }
+
+    scrollView.outputFrom(carousel.bind(scrollView));
+
     var scrollViewModifier = new StateModifier({
         origin: (OPTIONS.direction === 'X' ? OPTIONS.originX : OPTIONS.originY)
     });
@@ -63,11 +79,11 @@ define(function(require, exports, module) {
     mainContext.setPerspective(OPTIONS.perspective);
     mainContext.add(scrollViewModifier).add(scrollView);
 
-    scrollView._eventInput.on('update', function () {
-        // send information to each scrollViewItem
-        scrollView._eventOutput.emit('message', {
-            'offset': scrollView.getPosition(),
-            'screenSize': scrollView.getSize()
-        });
-    });
+    // scrollView._eventInput.on('update', function () {
+    //     // send information to each scrollViewItem
+    //     scrollView._eventOutput.emit('message', {
+    //         'offset': scrollView.getPosition(),
+    //         'screenSize': scrollView.getSize()
+    //     });
+    // });
 });
