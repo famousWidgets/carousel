@@ -12,10 +12,17 @@ define(function(require, exports, module) {
 
     var ScrollItemView = require('./views/ScrollItemView');
 
+    // OPTIONS
+    var OPTIONS = {
+        direction: Utility.Direction.X,
+        numItems: 100,
+        surfaceSize: 100
+    };
+
     var createScrollItemArray = function (num, size) {
         for (var i = 0; i < num; i += 1) {
             var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var scrollItemView = new ScrollItemView(color, size, i);
+            var scrollItemView = new ScrollItemView(color, size);
 
             // surfaces is closure-scoped
             scrollItemViews.push(scrollItemView);
@@ -37,8 +44,8 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
 
     var scrollView = new Scrollview({
-        direction: Utility.Direction.X
-        // paginated: true
+        direction: Utility.Direction.X,
+        paginated: true
     });
 
     var scrollViewModifier = new StateModifier({
@@ -46,7 +53,7 @@ define(function(require, exports, module) {
     });
 
     // populate scrollItemViews array
-    createScrollItemArray(100, 100);
+    createScrollItemArray(100, 50);
     scrollView.sequenceFrom(scrollItemViews);
 
     mainContext.setPerspective(500);

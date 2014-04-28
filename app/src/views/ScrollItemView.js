@@ -11,7 +11,7 @@ define(function(require, exports, module) {
      * @description
      */
 
-    var ScrollItemView = function (color, size, count) {
+    var ScrollItemView = function (color, size) {
         View.apply(this, arguments);
         
         this.color = color;
