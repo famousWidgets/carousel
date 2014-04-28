@@ -12,12 +12,33 @@ define(function(require, exports, module) {
 
     var ScrollItemView = require('./views/ScrollItemView');
 
-    // OPTIONS
+    /* CONFIGURATION OPTIONS */
     var OPTIONS = {
-        direction: Utility.Direction.X,
+        direction: Utility.Direction.Y,
+        paginated: false,
         numItems: 100,
-        surfaceSize: 100
+        surfaceSize: 50,
+        originX: [0, 0.5],
+        originY: [0.5, 0],
+        perspective: 500
     };
+
+    /* MAIN */
+
+    // contains list of scrollItemViews - to be used with scrollView
+    var scrollItemViews = [];
+
+    // create main context
+    var mainContext = Engine.createContext();
+
+    var scrollView = new Scrollview({
+        direction: OPTIONS.direction,
+        paginated: OPTIONS.paginated
+    });
+
+    var scrollViewModifier = new StateModifier({
+        origin: OPTIONS.originY
+    });
 
     var createScrollItemArray = function (num, size) {
         for (var i = 0; i < num; i += 1) {
@@ -35,28 +56,11 @@ define(function(require, exports, module) {
         }
     };
 
-    /* MAIN */
-
-    // contains list of scrollItemViews - to be used with scrollView
-    var scrollItemViews = [];
-
-    // create main context
-    var mainContext = Engine.createContext();
-
-    var scrollView = new Scrollview({
-        direction: Utility.Direction.X,
-        paginated: true
-    });
-
-    var scrollViewModifier = new StateModifier({
-        origin: [0, 0.5]
-    });
-
     // populate scrollItemViews array
-    createScrollItemArray(100, 50);
+    createScrollItemArray(OPTIONS.numItems, OPTIONS.surfaceSize);
     scrollView.sequenceFrom(scrollItemViews);
 
-    mainContext.setPerspective(500);
+    mainContext.setPerspective(OPTIONS.perspective);
     mainContext.add(scrollViewModifier).add(scrollView);
 
     scrollView._eventInput.on('update', function () {
