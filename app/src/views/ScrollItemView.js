@@ -30,7 +30,6 @@ define(function(require, exports, module) {
         // window['surfaceView' + count] = this;
 
         // listening from ScrollView
-        // var i = 0; // --> for testing purposes
         this._eventInput.on('message', function (data) {
             if (this.surface._matrix !== null) {
                 var surfaceMidpoint, scalingFactor;
@@ -62,9 +61,6 @@ define(function(require, exports, module) {
         finalScale: 2
     };
 
-    var OPTIONS = {
-    };
-
     var addSizeModifier = function () {
         this.sizeModifier = new StateModifier({
             size: [this.size, this.size]
@@ -89,16 +85,17 @@ define(function(require, exports, module) {
         this.add(this.sizeModifier).add(this.stateModifier).add(this.surface);
     };
 
-    var calculateScalingFactor = function (screenWidth, startingScale, endingScale, xPosition) {
-        var midpoint = screenWidth / 2;
+    var calculateScalingFactor = function (screenWidth, startingScale, endingScale, position) {
+        // position will be either the xPosition or yPosition values
 
+        var midpoint = screenWidth / 2; 
         // from 0 to midpoint
-        if (xPosition <= midpoint && xPosition >= 0) {
-            return ((endingScale - startingScale) / midpoint) * xPosition + startingScale;
+        if (position <= midpoint && position >= 0) {
+            return ((endingScale - startingScale) / midpoint) * position + startingScale;
         } 
         // from midpoint to screenWidth
-        else if (xPosition > midpoint && xPosition <= screenWidth){
-            return (-(endingScale - startingScale) / midpoint) * xPosition + (2 * (endingScale - startingScale) + startingScale);
+        else if (position > midpoint && position <= screenWidth){
+            return (-(endingScale - startingScale) / midpoint) * position + (2 * (endingScale - startingScale) + startingScale);
         }
         // when its offscreen
         else {

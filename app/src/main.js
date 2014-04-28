@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
     /* CONFIGURATION OPTIONS */
     var OPTIONS = {
-        direction: 'Y',
+        direction: 'X',
         paginated: false,
         numItems: 100,
         surfaceSize: 50,
