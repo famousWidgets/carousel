@@ -15,3 +15,8 @@ dist
 .tmp
 app/lib
 .yo-rc.json
+
+# Images #
+#################
+app/content/images/**/*
+!app/content/images/famous_logo.png
