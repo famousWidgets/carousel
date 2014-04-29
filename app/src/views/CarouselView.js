@@ -33,16 +33,6 @@ define(function(require, exports, module) {
     function _output(node, offset, target) {
         var size = node.getSize ? node.getSize() : this._contextSize;
         
-        // OLD VERSION
-        // var transform = oldOutput.call(this, offset, size[0]);
-        // var xScale = transform[0];
-        // var yScale = transform[5];
-
-        // target.push({transform: transform, target: node.render()});
-        // var scale = this.options.direction === Utility.Direction.X ? xScale : yScale;
-
-        // return size[this.options.direction] * scale;
-
         var transform = translateAndScale.call(this, offset, size[0]);
         var opacity = customFade.call(this, offset, size[0]);
 
@@ -94,9 +84,9 @@ define(function(require, exports, module) {
 
     function customFade (offset, size) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;  
-    
-        return 1;
+        var fadeAmt = scalingFactor(screenWidth, 0.2, 1, offset + size / 2);
         // return a number
+        return fadeAmt;
     }
 
     // COPIED OVER FROM SCROLLER
