@@ -19,6 +19,7 @@ define(function(require, exports, module) {
         ScrollView.apply(this, arguments);
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
+        // this.subscribe()
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -26,7 +27,7 @@ define(function(require, exports, module) {
     // CarouselView.prototype.outputFrom  = undefined;
 
     CarouselView.DEFAULT_OPTIONS = {
-        direction: Utility.Direction.X,
+        direction: Utility.Direction.Y,
         paginated: true
     };
 
@@ -109,31 +110,33 @@ define(function(require, exports, module) {
         return result;        
     }
 
-    function calculateScalingFactor (screenWidth, startingScale, endingScale, position) {
-        // position will be either the xPosition or yPosition values
+    function scalingFactor (screenWidth, startScale, endScale, currentPosition) {
+        // currentPosition will be along x or y axis
 
         var midpoint = screenWidth / 2; 
         // from 0 to midpoint
-        if (position <= midpoint && position >= 0) {
-            return ((endingScale - startingScale) / midpoint) * position + startingScale;
+        if (currentPosition <= midpoint && currentPosition >= 0) {
+            return ((endScale - startScale) / midpoint) * currentPosition + startScale;
         } 
         // from midpoint to screenWidth
-        else if (position > midpoint && position <= screenWidth){
-            return (-(endingScale - startingScale) / midpoint) * position + (2 * (endingScale - startingScale) + startingScale);
+        else if (currentPosition > midpoint && currentPosition <= screenWidth){
+            return (-(endScale - startScale) / midpoint) * currentPosition + (2 * (endScale - startScale) + startScale);
         }
         // when its offscreen
         else {
-            return startingScale;
+            return startScale;
         }
     }
 
     function oldOutput (offset, size) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+
         // for scaling
         var scaleVector = [1, 1, 1];
-        var scalingFactor = calculateScalingFactor((this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight), 1, 2, offset + size / 2);
+        var scaling = scalingFactor(screenWidth, 1, 2, offset + size / 2);
         
-        scaleVector[0] = scalingFactor;
-        scaleVector[1] = scalingFactor;
+        scaleVector[0] = scaling;
+        scaleVector[1] = scaling;
 
         // for translation
         var vector = [0, 0, 0];
