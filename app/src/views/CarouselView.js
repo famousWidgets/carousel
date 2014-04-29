@@ -19,7 +19,6 @@ define(function(require, exports, module) {
         ScrollView.apply(this, arguments);
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
-        // this.subscribe()
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -45,10 +44,12 @@ define(function(require, exports, module) {
         // return size[this.options.direction] * scale;
 
         var transform = translateAndScale.call(this, offset, size[0]);
+        var opacity = customFade.call(this, offset, size[0]);
+
         var xScale = transform[0];
         var yScale = transform[5];
 
-        target.push({transform: transform, target: node.render()});
+        target.push({transform: transform, opacity: opacity, target: node.render()});
         var scale = this.options.direction === Utility.Direction.X ? xScale : yScale;
 
         return size[this.options.direction] * scale;
@@ -89,6 +90,13 @@ define(function(require, exports, module) {
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
 
         return transform;
+    }
+
+    function customFade (offset, size) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;  
+    
+        return 1;
+        // return a number
     }
 
     // COPIED OVER FROM SCROLLER
