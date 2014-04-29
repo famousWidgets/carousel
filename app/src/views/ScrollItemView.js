@@ -11,12 +11,11 @@ define(function(require, exports, module) {
      * @description
      */
 
-    var ScrollItemView = function (color, size, direction) { // count
+    var ScrollItemView = function (color, size) {
         View.apply(this, arguments);
         
         this.color = color;
         this.size = size;
-        this.direction = direction;
         
         // modifiers must be called first
         addSizeModifier.call(this);
@@ -54,15 +53,6 @@ define(function(require, exports, module) {
 
     ScrollItemView.prototype = Object.create(View.prototype);
     ScrollItemView.prototype.constructor = ScrollItemView;
-    
-    // will get called by ScrollView for each scrollItemView
-    ScrollItemView.prototype.getSize = function () {
-        if (this.surface._matrix) {
-            return [ this.surface._matrix[0] * this.size, this.surface._matrix[5] * this.size ];
-        } else {
-            return [ this.size, this.size ];
-        }
-    };
 
     ScrollItemView.DEFAULT_OPTIONS = {
     };
@@ -84,10 +74,7 @@ define(function(require, exports, module) {
                 backgroundColor: this.color
             }
         });
-
         this.surface.pipe(this._eventOutput);
-
-        // add everything together
         this.add(this.sizeModifier).add(this.stateModifier).add(this.surface);
     };
 

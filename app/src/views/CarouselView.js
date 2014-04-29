@@ -21,16 +21,26 @@ define(function(require, exports, module) {
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
     };
 
+    CarouselView.prototype = Object.create(ScrollView.prototype);
+    CarouselView.prototype.constructor = CarouselView;
+    // CarouselView.prototype.outputFrom  = undefined;
+
+    CarouselView.DEFAULT_OPTIONS = {
+        direction: Utility.Direction.X,
+        paginated: true
+    };
+
     function _output(node, offset, target) {
         var size = node.getSize ? node.getSize() : this._contextSize;
         
         //build our transform, figure out the scale
-        var transform = oldOutput.call(this, offset);
-        // console.log("Transform is:", transform);
+        var transform = oldOutput.call(this, offset, size[0]);
+        var xScale = transform[0];
+        var yScale = transform[5];
 
         target.push({transform: transform, target: node.render()});
+        var scale = this.options.direction === Utility.Direction.X ? xScale : yScale;
 
-        var scale = this.options.direction === Utility.Direction.X ? transform[0] : transform[5];
         return size[this.options.direction] * scale;
     }
 
@@ -117,33 +127,52 @@ define(function(require, exports, module) {
         }
     }
 
-    var oldOutput = function(offset) {
-        var direction = this.options.direction;
-        
+    function oldOutput (offset, size) {
         // for scaling
         var scaleVector = [1, 1, 1];
-        var scalingFactor = calculateScalingFactor((this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight), 1, 2, offset - this.getPosition());
+        var scalingFactor = calculateScalingFactor((this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight), 1, 2, offset + size / 2);
         
         scaleVector[0] = scalingFactor;
         scaleVector[1] = scalingFactor;
 
         // for translation
         var vector = [0, 0, 0];
-        vector[direction] = offset;
+        vector[this.options.direction] = offset;
 
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
 
         return transform;
-    };
+    }
 
-    CarouselView.prototype = Object.create(ScrollView.prototype);
-    CarouselView.prototype.constructor = CarouselView;
-    CarouselView.prototype.outputFrom  = undefined;
+    // COPIED OVER
+    function _sizeForDir(size) {
+        if (!size) size = this._contextSize;
+        var dimension = (this.options.direction === Utility.Direction.X) ? 0 : 1;
+        return (size[dimension] === undefined) ? this._contextSize[dimension] : size[dimension];
+    }
 
-    CarouselView.DEFAULT_OPTIONS = {
-        direction: Utility.Direction.X,
-        paginated: false
-    };
+    function _getClipSize() {
+        if (this.options.clipSize) return this.options.clipSize;
+        else return _sizeForDir.call(this, this._contextSize);
+    }
+
+    function _normalizeState() {
+        var nodeSize = _sizeForDir.call(this, this._node.getSize());
+        var nextNode = this._node && this._node.getNext ? this._node.getNext() : null;
+        while (nextNode && this._position + this._positionOffset >= nodeSize) {
+            this._positionOffset -= nodeSize;
+            this._node = nextNode;
+            nodeSize = _sizeForDir.call(this, this._node.getSize());
+            nextNode = this._node && this._node.getNext ? this._node.getNext() : null;
+        }
+        var prevNode = this._node && this._node.getPrevious ? this._node.getPrevious() : null;
+        while (prevNode && this._position + this._positionOffset < 0) {
+            var prevNodeSize = _sizeForDir.call(this, prevNode.getSize());
+            this._positionOffset += prevNodeSize;
+            this._node = prevNode;
+            prevNode = this._node && this._node.getPrevious ? this._node.getPrevious() : null;
+        }
+    }
 
     module.exports = CarouselView;
 });
