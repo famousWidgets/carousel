@@ -18,6 +18,8 @@ define(function(require, exports, module) {
 
     function CarouselView (options) {
         ScrollView.apply(this, arguments);
+        this.setOptions(CarouselView.DEFAULT_OPTIONS);
+        this.setOptions(options);
         // this.options = Object.create(CarouselView.DEFAULT_OPTIONS);
         // this._optionsManager = new OptionsManager(this.options);
         
@@ -43,7 +45,7 @@ define(function(require, exports, module) {
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
-        
+
         var transform = translateAndScale.call(this, offset, size[0]);
         var opacity = customFade.call(this, offset, size[0]);
 
@@ -93,7 +95,6 @@ define(function(require, exports, module) {
         vector[direction] = offset;
 
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
-
         return transform;
     }
 
