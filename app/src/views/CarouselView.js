@@ -15,11 +15,11 @@ define(function(require, exports, module) {
      * @description
      */
 
-    var CarouselView = function (options) {
+    function CarouselView (options) {
         ScrollView.apply(this, arguments);
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
-    };
+    }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
     CarouselView.prototype.constructor = CarouselView;
@@ -144,7 +144,7 @@ define(function(require, exports, module) {
         return transform;
     }
 
-    // COPIED OVER
+    // COPIED OVER FROM SCROLLER
     function _sizeForDir(size) {
         if (!size) size = this._contextSize;
         var dimension = (this.options.direction === Utility.Direction.X) ? 0 : 1;
