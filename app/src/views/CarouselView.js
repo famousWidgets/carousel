@@ -18,14 +18,13 @@ define(function(require, exports, module) {
 
     function CarouselView (options) {
         ScrollView.apply(this, arguments);
-
-        this.options = Object.create(CarouselView.DEFAULT_OPTIONS);
-        this._optionsManager = new OptionsManager(this.options);
+        // this.options = Object.create(CarouselView.DEFAULT_OPTIONS);
+        // this._optionsManager = new OptionsManager(this.options);
         
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
 
-        if (options) this.setOptions(options);
+        // if (options) this.setOptions(options);
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -36,10 +35,13 @@ define(function(require, exports, module) {
         direction: Utility.Direction.X,
         paginated: true,
         startScale: 1,
-        endScale: 1
+        endScale: 1,
+        startFade: 0.3,
+        endFade: 1
     };
 
     function _output(node, offset, target) {
+        var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
         
         var transform = translateAndScale.call(this, offset, size[0]);
@@ -49,9 +51,9 @@ define(function(require, exports, module) {
         var yScale = transform[5];
 
         target.push({transform: transform, opacity: opacity, target: node.render()});
-        var scale = this.options.direction === Utility.Direction.X ? xScale : yScale;
+        var scale = direction === Utility.Direction.X ? xScale : yScale;
 
-        return size[this.options.direction] * scale;
+        return size[direction] * scale;
     }
 
     function scalingFactor (screenWidth, startScale, endScale, currentPosition) {
@@ -73,18 +75,22 @@ define(function(require, exports, module) {
     }
 
     function translateAndScale (offset, size) {
+        var direction = this.options.direction;
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var startScale = this.options.startScale;
+        var endScale = this.options.endScale;
+        var position = offset + size / 2;
 
         // for scaling
         var scaleVector = [1, 1, 1];
-        var scaling = scalingFactor(screenWidth, 1, 2, offset + size / 2);
+        var scaling = scalingFactor(screenWidth, startScale, endScale, position);
         
         scaleVector[0] = scaling;
         scaleVector[1] = scaling;
 
         // for translation
         var vector = [0, 0, 0];
-        vector[this.options.direction] = offset;
+        vector[direction] = offset;
 
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
 
@@ -92,9 +98,12 @@ define(function(require, exports, module) {
     }
 
     function customFade (offset, size) {
-        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;  
-        var fadeAmt = scalingFactor(screenWidth, 0.2, 1, offset + size / 2);
-        // return a number
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var startFade = this.options.startFade;
+        var endFade = this.options.endFade;
+        var position = offset + size / 2;
+
+        var fadeAmt = scalingFactor(screenWidth, startFade, endFade, position);
         return fadeAmt;
     }
 

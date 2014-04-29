@@ -21,7 +21,14 @@ define(function(require, exports, module) {
         }
     };
 
-    var carousel = new CarouselView();
+    var carousel = new CarouselView({ 
+        direction: Utility.Direction.X,
+        startScale: 1,
+        endScale: 3,
+        startFade: 0.3,
+        endFade: 1
+    });
+    
     createScrollItemArray(100, 50);
     carousel.sequenceFrom(scrollItemViews);
 
