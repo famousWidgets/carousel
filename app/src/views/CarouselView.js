@@ -15,35 +15,81 @@ define(function(require, exports, module) {
      * @description
      */
 
-    var CarouselView = function (options) {
+    function CarouselView (options) {
         ScrollView.apply(this, arguments);
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
-    };
+    }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
     CarouselView.prototype.constructor = CarouselView;
     // CarouselView.prototype.outputFrom  = undefined;
 
     CarouselView.DEFAULT_OPTIONS = {
-        direction: Utility.Direction.X,
+        direction: Utility.Direction.Y,
         paginated: true
     };
 
     function _output(node, offset, target) {
         var size = node.getSize ? node.getSize() : this._contextSize;
         
-        //build our transform, figure out the scale
-        var transform = oldOutput.call(this, offset, size[0]);
+        var transform = translateAndScale.call(this, offset, size[0]);
+        var opacity = customFade.call(this, offset, size[0]);
+
         var xScale = transform[0];
         var yScale = transform[5];
 
-        target.push({transform: transform, target: node.render()});
+        target.push({transform: transform, opacity: opacity, target: node.render()});
         var scale = this.options.direction === Utility.Direction.X ? xScale : yScale;
 
         return size[this.options.direction] * scale;
     }
 
+    function scalingFactor (screenWidth, startScale, endScale, currentPosition) {
+        // currentPosition will be along x or y axis
+
+        var midpoint = screenWidth / 2; 
+        // from 0 to midpoint
+        if (currentPosition <= midpoint && currentPosition >= 0) {
+            return ((endScale - startScale) / midpoint) * currentPosition + startScale;
+        } 
+        // from midpoint to screenWidth
+        else if (currentPosition > midpoint && currentPosition <= screenWidth){
+            return (-(endScale - startScale) / midpoint) * currentPosition + (2 * (endScale - startScale) + startScale);
+        }
+        // when its offscreen
+        else {
+            return startScale;
+        }
+    }
+
+    function translateAndScale (offset, size) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+
+        // for scaling
+        var scaleVector = [1, 1, 1];
+        var scaling = scalingFactor(screenWidth, 1, 2, offset + size / 2);
+        
+        scaleVector[0] = scaling;
+        scaleVector[1] = scaling;
+
+        // for translation
+        var vector = [0, 0, 0];
+        vector[this.options.direction] = offset;
+
+        var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
+
+        return transform;
+    }
+
+    function customFade (offset, size) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;  
+        var fadeAmt = scalingFactor(screenWidth, 0.2, 1, offset + size / 2);
+        // return a number
+        return fadeAmt;
+    }
+
+    // COPIED OVER FROM SCROLLER
     function _customInnerRender() {
         var size = null;
         var position = this._position;
@@ -109,42 +155,6 @@ define(function(require, exports, module) {
         return result;        
     }
 
-    function calculateScalingFactor (screenWidth, startingScale, endingScale, position) {
-        // position will be either the xPosition or yPosition values
-
-        var midpoint = screenWidth / 2; 
-        // from 0 to midpoint
-        if (position <= midpoint && position >= 0) {
-            return ((endingScale - startingScale) / midpoint) * position + startingScale;
-        } 
-        // from midpoint to screenWidth
-        else if (position > midpoint && position <= screenWidth){
-            return (-(endingScale - startingScale) / midpoint) * position + (2 * (endingScale - startingScale) + startingScale);
-        }
-        // when its offscreen
-        else {
-            return startingScale;
-        }
-    }
-
-    function oldOutput (offset, size) {
-        // for scaling
-        var scaleVector = [1, 1, 1];
-        var scalingFactor = calculateScalingFactor((this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight), 1, 2, offset + size / 2);
-        
-        scaleVector[0] = scalingFactor;
-        scaleVector[1] = scalingFactor;
-
-        // for translation
-        var vector = [0, 0, 0];
-        vector[this.options.direction] = offset;
-
-        var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
-
-        return transform;
-    }
-
-    // COPIED OVER
     function _sizeForDir(size) {
         if (!size) size = this._contextSize;
         var dimension = (this.options.direction === Utility.Direction.X) ? 0 : 1;

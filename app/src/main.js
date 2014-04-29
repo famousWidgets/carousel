@@ -21,23 +21,26 @@ define(function(require, exports, module) {
         }
     };
 
-    var carousel = new CarouselView({ direction: Utility.Direction.Y });
+    var carousel = new CarouselView({ direction: Utility.Direction.X });
     createScrollItemArray(100, 50);
     carousel.sequenceFrom(scrollItemViews);
 
+    // adding a visual on screen for midpoint
     var midHSurface = new Surface({
-        size : [window.innerWidth, 5],
+        size : [5, window.innerHeight],
         properties: {
             backgroundColor: 'red'
         }
     });
 
     var midHMod = new StateModifier({
-        origin: [0, 0.5]
+        origin: [0.5, 0]
     });
 
     window.carousel = carousel;
-    var carouselModifier = new StateModifier();
+    var carouselModifier = new StateModifier({
+        origin: [0, 0.5]
+    });
 
     mainContext.setPerspective(500);
     mainContext.add(carouselModifier).add(carousel);
