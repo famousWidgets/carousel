@@ -8,6 +8,7 @@ define(function(require, exports, module) {
     var ScrollView = require('famous/views/ScrollView');
     var ScrollItemView = require('./ScrollItemView');
     var Group = require('famous/core/Group');
+    var OptionsManager = require('famous/core/OptionsManager');
 
     /*
      * @name CarouselView
@@ -17,8 +18,14 @@ define(function(require, exports, module) {
 
     function CarouselView (options) {
         ScrollView.apply(this, arguments);
+
+        this.options = Object.create(CarouselView.DEFAULT_OPTIONS);
+        this._optionsManager = new OptionsManager(this.options);
+        
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
+
+        if (options) this.setOptions(options);
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -26,8 +33,10 @@ define(function(require, exports, module) {
     // CarouselView.prototype.outputFrom  = undefined;
 
     CarouselView.DEFAULT_OPTIONS = {
-        direction: Utility.Direction.Y,
-        paginated: true
+        direction: Utility.Direction.X,
+        paginated: true,
+        startScale: 1,
+        endScale: 1
     };
 
     function _output(node, offset, target) {
@@ -47,8 +56,8 @@ define(function(require, exports, module) {
 
     function scalingFactor (screenWidth, startScale, endScale, currentPosition) {
         // currentPosition will be along x or y axis
+        var midpoint = screenWidth / 2;
 
-        var midpoint = screenWidth / 2; 
         // from 0 to midpoint
         if (currentPosition <= midpoint && currentPosition >= 0) {
             return ((endScale - startScale) / midpoint) * currentPosition + startScale;

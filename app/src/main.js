@@ -21,7 +21,7 @@ define(function(require, exports, module) {
         }
     };
 
-    var carousel = new CarouselView({ direction: Utility.Direction.X });
+    var carousel = new CarouselView();
     createScrollItemArray(100, 50);
     carousel.sequenceFrom(scrollItemViews);
 
