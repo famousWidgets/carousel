@@ -44,8 +44,8 @@ define(function(require, exports, module) {
         startDepth: 1,
         endDepth: 1,
         rotateRadian: Math.PI / 2,
-        rotateOrigin: 0,
-        maxVelocity: 100
+        // rotateOrigin: 0,
+        maxVelocity: 3000
     };
 
     function _output(node, offset, target) {
@@ -91,7 +91,7 @@ define(function(require, exports, module) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var midpoint = screenWidth / 2;
         var rotateRadian = this.options.rotateRadian;
-        var velocity = this.velocity || 1;
+        var velocity = this.velocity || this.options.maxVelocity;
 
         // var rad = -(rotateRadian * position / midpoint) + rotateRadian;
         var rad = -(rotateRadian * velocity / this.options.maxVelocity) + rotateRadian;
