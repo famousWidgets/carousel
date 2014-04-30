@@ -8,6 +8,7 @@ define(function(require, exports, module) {
     var ScrollView = require('famous/views/ScrollView');
     var ScrollItemView = require('./ScrollItemView');
     var Group = require('famous/core/Group');
+    var OptionsManager = require('famous/core/OptionsManager');
 
     /*
      * @name CarouselView
@@ -15,11 +16,16 @@ define(function(require, exports, module) {
      * @description
      */
 
-    var CarouselView = function (options) {
+    function CarouselView (options) {
         ScrollView.apply(this, arguments);
+        this.setOptions(CarouselView.DEFAULT_OPTIONS);
+        this.setOptions(options);
+
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
-    };
+
+        this._scroller.ourGetPosition = this.getPosition.bind(this);
+    }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
     CarouselView.prototype.constructor = CarouselView;
@@ -27,23 +33,80 @@ define(function(require, exports, module) {
 
     CarouselView.DEFAULT_OPTIONS = {
         direction: Utility.Direction.X,
-        paginated: true
+        paginated: false,
+        startScale: 1,
+        endScale: 1,
+        startFade: 0.1,
+        endFade: 1
     };
 
     function _output(node, offset, target) {
+        var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
-        
-        //build our transform, figure out the scale
-        var transform = oldOutput.call(this, offset, size[0]);
+
+        var transform = translateAndScale.call(this, offset, size[0]);
+        var opacity = customFade.call(this, offset, size[0]);
+
         var xScale = transform[0];
         var yScale = transform[5];
 
-        target.push({transform: transform, target: node.render()});
-        var scale = this.options.direction === Utility.Direction.X ? xScale : yScale;
+        target.push({transform: transform, opacity: opacity, target: node.render()});
+        var scale = direction === Utility.Direction.X ? xScale : yScale;
 
-        return size[this.options.direction] * scale;
+        return size[direction] * scale;
     }
 
+    function scalingFactor (screenWidth, startScale, endScale, currentPosition) {
+        // currentPosition will be along x or y axis
+        var midpoint = screenWidth / 2;
+
+        // from 0 to midpoint
+        if (currentPosition <= midpoint && currentPosition >= 0) {
+            return ((endScale - startScale) / midpoint) * currentPosition + startScale;
+        } 
+        // from midpoint to screenWidth
+        else if (currentPosition > midpoint && currentPosition <= screenWidth){
+            return (-(endScale - startScale) / midpoint) * currentPosition + (2 * (endScale - startScale) + startScale);
+        }
+        // when its offscreen
+        else {
+            return startScale;
+        }
+    }
+
+    function translateAndScale (offset, size) {
+        var direction = this.options.direction;
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var startScale = this.options.startScale;
+        var endScale = this.options.endScale;
+        var position = offset + size / 2 - this.ourGetPosition();
+
+        // for scaling
+        var scaleVector = [1, 1, 1];
+        var scaling = scalingFactor(screenWidth, startScale, endScale, position);
+        
+        scaleVector[0] = scaling;
+        scaleVector[1] = scaling;
+
+        // for translation
+        var vector = [0, 0, 0];
+        vector[direction] = offset;
+
+        var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
+        return transform;
+    }
+
+    function customFade (offset, size) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var startFade = this.options.startFade;
+        var endFade = this.options.endFade;
+        var position = offset + size / 2;
+
+        var fadeAmt = scalingFactor(screenWidth, startFade, endFade, position);
+        return fadeAmt;
+    }
+
+    // COPIED OVER FROM SCROLLER
     function _customInnerRender() {
         var size = null;
         var position = this._position;
@@ -109,42 +172,6 @@ define(function(require, exports, module) {
         return result;        
     }
 
-    function calculateScalingFactor (screenWidth, startingScale, endingScale, position) {
-        // position will be either the xPosition or yPosition values
-
-        var midpoint = screenWidth / 2; 
-        // from 0 to midpoint
-        if (position <= midpoint && position >= 0) {
-            return ((endingScale - startingScale) / midpoint) * position + startingScale;
-        } 
-        // from midpoint to screenWidth
-        else if (position > midpoint && position <= screenWidth){
-            return (-(endingScale - startingScale) / midpoint) * position + (2 * (endingScale - startingScale) + startingScale);
-        }
-        // when its offscreen
-        else {
-            return startingScale;
-        }
-    }
-
-    function oldOutput (offset, size) {
-        // for scaling
-        var scaleVector = [1, 1, 1];
-        var scalingFactor = calculateScalingFactor((this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight), 1, 2, offset + size / 2);
-        
-        scaleVector[0] = scalingFactor;
-        scaleVector[1] = scalingFactor;
-
-        // for translation
-        var vector = [0, 0, 0];
-        vector[this.options.direction] = offset;
-
-        var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
-
-        return transform;
-    }
-
-    // COPIED OVER
     function _sizeForDir(size) {
         if (!size) size = this._contextSize;
         var dimension = (this.options.direction === Utility.Direction.X) ? 0 : 1;
