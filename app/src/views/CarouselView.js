@@ -26,11 +26,10 @@ define(function(require, exports, module) {
 
         this._scroller.ourGetPosition = this.getPosition.bind(this);
         this._eventInput.on('update', _customHandleMove.bind(this._scroller));
-        this._eventInput.on('end', _endVelocity.bind(this._scroller));
+        // this._eventInput.on('end', _endVelocity.bind(this._scroller));
     }
 
     function _customHandleMove (e) {
-        console.log('update: ', e, ' vel: ', e.velocity);
         this.velocity = e.velocity;
     }
 
@@ -94,15 +93,18 @@ define(function(require, exports, module) {
             return startScale;
         }
     }
-
     function rotateFactor (position, offset) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var midpoint = screenWidth / 2;
         var rotateRadian = this.options.rotateRadian;
-        var velocity = this.velocity || 1;
+        var velocity = this.velocity || this.options.maxVelocity;
 
+        var inQuint = function(t) {
+            return t*t*t*t*t;
+        };
         // var rad = -(rotateRadian * position / midpoint) + rotateRadian;
-        var rad = -(rotateRadian * velocity / this.options.maxVelocity) + rotateRadian;
+        var finalVelocity = inQuint(Math.abs(velocity));
+        var rad = -(rotateRadian * finalVelocity) + rotateRadian;
         return Transform.rotateY(rad);
     }
 
@@ -127,7 +129,7 @@ define(function(require, exports, module) {
         // for translation
         var vector = [0, 0, 0];
         vector[direction] = offset;
-        
+
         // adding depth
         vector[2] = depth;
 

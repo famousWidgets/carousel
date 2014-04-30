@@ -24,12 +24,12 @@ define(function(require, exports, module) {
 
     var carousel = new CarouselView({
         // endScale: 2,
-        // startFade: 0.1,
+        startFade: 0.1,
         // endDepth: 50
         // rotateRadian: null
     });
 
-    createScrollItemArray(100, 100);
+    createScrollItemArray(100, 50);
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
@@ -62,7 +62,7 @@ define(function(require, exports, module) {
 
     // blahModifier.setTransform(
     //    Transform.rotateY(2 * Math.PI),
-    //    { duration: 10000 } 
+    //    { duration: 10000 }
     // );
 
     mainContext.setPerspective(300);
