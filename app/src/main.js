@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     var CarouselView = require('./views/CarouselView');
     var ScrollItemView = require('./views/ScrollItemView');
     var Utility = require('famous/utilities/Utility');
+    var Transform = require('famous/core/Transform');
 
     var mainContext = Engine.createContext();
     var scrollItemViews = [];
@@ -22,8 +23,10 @@ define(function(require, exports, module) {
     };
 
     var carousel = new CarouselView({
-        endScale: 1,
-        startFade: 0.1
+        // endScale: 2,
+        // startFade: 0.1,
+        // endDepth: 50
+        // rotateRadian: null
     });
 
     createScrollItemArray(100, 100);
@@ -46,7 +49,24 @@ define(function(require, exports, module) {
         origin: [0, 0.5]
     });
 
-    mainContext.setPerspective(500);
+    // var blahSurface = new Surface({
+    //     size: [100, 100],
+    //     properties: {
+    //         backgroundColor: 'red'
+    //     }
+    // });
+
+    // var blahModifier = new StateModifier({
+    //     origin: [0.5, 0.5]
+    // });
+
+    // blahModifier.setTransform(
+    //    Transform.rotateY(2 * Math.PI),
+    //    { duration: 10000 } 
+    // );
+
+    mainContext.setPerspective(300);
     mainContext.add(carouselModifier).add(carousel);
     mainContext.add(midHMod).add(midHSurface);
+    // mainContext.add(blahModifier).add(blahSurface);
 });
