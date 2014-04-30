@@ -22,7 +22,7 @@ define(function(require, exports, module) {
     };
 
     var carousel = new CarouselView({
-        endScale: 2,
+        endScale: 1,
         startFade: 0.1
     });
 

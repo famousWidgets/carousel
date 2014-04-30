@@ -25,6 +25,7 @@ define(function(require, exports, module) {
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
 
         this._scroller.ourGetPosition = this.getPosition.bind(this);
+        // this._eventInput.on('update', _customHandleMove);
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -63,7 +64,7 @@ define(function(require, exports, module) {
         // from 0 to midpoint
         if (currentPosition <= midpoint && currentPosition >= 0) {
             return ((endScale - startScale) / midpoint) * currentPosition + startScale;
-        } 
+        }
         // from midpoint to screenWidth
         else if (currentPosition > midpoint && currentPosition <= screenWidth){
             return (-(endScale - startScale) / midpoint) * currentPosition + (2 * (endScale - startScale) + startScale);
@@ -84,13 +85,20 @@ define(function(require, exports, module) {
         // for scaling
         var scaleVector = [1, 1, 1];
         var scaling = scalingFactor(screenWidth, startScale, endScale, position);
-        
+
+        // for depth
+        var depth = scalingFactor(screenWidth, 1, 200, position);
+
         scaleVector[0] = scaling;
         scaleVector[1] = scaling;
 
         // for translation
         var vector = [0, 0, 0];
         vector[direction] = offset;
+            vector[2] = depth;
+
+
+
 
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
         return transform;
@@ -169,7 +177,7 @@ define(function(require, exports, module) {
         }
 
         _normalizeState.call(this);
-        return result;        
+        return result;
     }
 
     function _sizeForDir(size) {
