@@ -20,13 +20,11 @@ define(function(require, exports, module) {
         ScrollView.apply(this, arguments);
         this.setOptions(CarouselView.DEFAULT_OPTIONS);
         this.setOptions(options);
-        // this.options = Object.create(CarouselView.DEFAULT_OPTIONS);
-        // this._optionsManager = new OptionsManager(this.options);
-        
+
         this._scroller.group = new Group();
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
 
-        // if (options) this.setOptions(options);
+        this._scroller.ourGetPosition = this.getPosition.bind(this);
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -35,10 +33,10 @@ define(function(require, exports, module) {
 
     CarouselView.DEFAULT_OPTIONS = {
         direction: Utility.Direction.X,
-        paginated: true,
+        paginated: false,
         startScale: 1,
         endScale: 1,
-        startFade: 0.3,
+        startFade: 0.1,
         endFade: 1
     };
 
@@ -81,7 +79,7 @@ define(function(require, exports, module) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var startScale = this.options.startScale;
         var endScale = this.options.endScale;
-        var position = offset + size / 2;
+        var position = offset + size / 2 - this.ourGetPosition();
 
         // for scaling
         var scaleVector = [1, 1, 1];

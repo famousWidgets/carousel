@@ -22,10 +22,11 @@ define(function(require, exports, module) {
     };
 
     var carousel = new CarouselView({
-        endScale: 2
+        endScale: 2,
+        startFade: 0.1
     });
 
-    createScrollItemArray(100, 50);
+    createScrollItemArray(100, 100);
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
