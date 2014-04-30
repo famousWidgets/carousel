@@ -38,15 +38,17 @@ define(function(require, exports, module) {
         startScale: 1,
         endScale: 1,
         startFade: 0.1,
-        endFade: 1
+        endFade: 1,
+        startDepth: 1,
+        endDepth: 200
     };
 
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
 
-        var transform = translateAndScale.call(this, offset, size[0]);
-        var opacity = customFade.call(this, offset, size[0]);
+        var transform = translateAndScale.call(this, offset, size[direction]);
+        var opacity = customFade.call(this, offset, size[direction]);
 
         var xScale = transform[0];
         var yScale = transform[5];
@@ -80,6 +82,8 @@ define(function(require, exports, module) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var startScale = this.options.startScale;
         var endScale = this.options.endScale;
+        var startDepth = this.options.startDepth;
+        var endDepth = this.options.endDepth;
         var position = offset + size / 2 - this.ourGetPosition();
 
         // for scaling
@@ -87,7 +91,7 @@ define(function(require, exports, module) {
         var scaling = scalingFactor(screenWidth, startScale, endScale, position);
 
         // for depth
-        var depth = scalingFactor(screenWidth, 1, 200, position);
+        var depth = scalingFactor(screenWidth, startDepth, endDepth, position);
 
         scaleVector[0] = scaling;
         scaleVector[1] = scaling;
@@ -95,10 +99,9 @@ define(function(require, exports, module) {
         // for translation
         var vector = [0, 0, 0];
         vector[direction] = offset;
-            vector[2] = depth;
-
-
-
+        
+        // adding depth
+        vector[2] = depth;
 
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
         return transform;
