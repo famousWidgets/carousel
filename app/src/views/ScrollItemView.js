@@ -22,33 +22,6 @@ define(function(require, exports, module) {
         addStateModifier.call(this);
 
         addSurface.call(this);
-
-        // for testing purposes - remove later
-        // window['surface' + count] = this.surface;
-        // window['surfaceView' + count] = this;
-
-        // listening from ScrollView
-        // this._eventInput.on('message', function (data) {
-        //     if (this.surface._matrix !== null) {
-        //         var surfaceMidpoint, scalingFactor;
-
-        //         if (this.direction === 'X') {
-        //             surfaceMidpoint = -Math.floor(data.offset) + this.surface._matrix[12] + Math.floor(this.sizeModifier.getSize()[0]/2);
-        //             scalingFactor = calculateScalingFactor(data.screenSize[0], this.options.initialScale, this.options.finalScale, surfaceMidpoint);
-        //         } else {
-        //             surfaceMidpoint = -Math.floor(data.offset) + this.surface._matrix[13] + Math.floor(this.sizeModifier.getSize()[1]/2);
-        //             scalingFactor = calculateScalingFactor(data.screenSize[1], this.options.initialScale, this.options.finalScale, surfaceMidpoint);
-        //         }
-
-        //         this.stateModifier.setTransform(
-        //             Transform.scale(scalingFactor, scalingFactor, 1)
-        //         );
-
-        //         this.sizeModifier.setSize(
-        //             [this.surface.getSize()[0] * scalingFactor, this.surface.getSize()[1] * scalingFactor]
-        //         );
-        //     }
-        // }.bind(this));
     };
 
     ScrollItemView.prototype = Object.create(View.prototype);
@@ -80,3 +53,31 @@ define(function(require, exports, module) {
 
     module.exports = ScrollItemView;
 });
+
+// OLD CODE WITHIN CONSTRUCTOR
+// for testing purposes - remove later
+// window['surface' + count] = this.surface;
+// window['surfaceView' + count] = this;
+
+// listening from ScrollView
+// this._eventInput.on('message', function (data) {
+//     if (this.surface._matrix !== null) {
+//         var surfaceMidpoint, scalingFactor;
+
+//         if (this.direction === 'X') {
+//             surfaceMidpoint = -Math.floor(data.offset) + this.surface._matrix[12] + Math.floor(this.sizeModifier.getSize()[0]/2);
+//             scalingFactor = calculateScalingFactor(data.screenSize[0], this.options.initialScale, this.options.finalScale, surfaceMidpoint);
+//         } else {
+//             surfaceMidpoint = -Math.floor(data.offset) + this.surface._matrix[13] + Math.floor(this.sizeModifier.getSize()[1]/2);
+//             scalingFactor = calculateScalingFactor(data.screenSize[1], this.options.initialScale, this.options.finalScale, surfaceMidpoint);
+//         }
+
+//         this.stateModifier.setTransform(
+//             Transform.scale(scalingFactor, scalingFactor, 1)
+//         );
+
+//         this.sizeModifier.setSize(
+//             [this.surface.getSize()[0] * scalingFactor, this.surface.getSize()[1] * scalingFactor]
+//         );
+//     }
+// }.bind(this));
