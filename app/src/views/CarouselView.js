@@ -137,7 +137,6 @@ define(function(require, exports, module) {
     }
 
     function _customHandleMove (e) {
-        // console.log('update: ', e, ' vel: ', e.velocity);
         this.velocity = e.velocity;
     }
 
