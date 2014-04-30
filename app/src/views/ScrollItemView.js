@@ -37,12 +37,15 @@ define(function(require, exports, module) {
     };
 
     var addStateModifier = function () {
-        this.stateModifier = new StateModifier();
+        this.stateModifier = new StateModifier({
+            origin: [0.5, 0.5]
+        });
     };
 
     var addSurface = function () {
         this.surface = new Surface({
             size : [this.size, this.size],
+            origin: [0.5, 0.5],
             properties: {
                 backgroundColor: this.color
             }
