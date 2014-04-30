@@ -37,19 +37,27 @@ define(function(require, exports, module) {
         paginated: false,
         startScale: 1,
         endScale: 1,
-        startFade: 0.1,
-        endFade: 1
+        startFade: 1,
+        endFade: 1,
+        startDepth: 1,
+        endDepth: 1,
+        rotateRadian: Math.PI / 2
     };
 
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
+        var position = offset + size[direction] / 2 - this.ourGetPosition();
 
-        var transform = translateAndScale.call(this, offset, size[0]);
-        var opacity = customFade.call(this, offset, size[0]);
+        // TRANSFORM FUNCTIONS
+        var translateScale = translateAndScale.call(this, position, offset);
+        var opacity = customFade.call(this, position, offset);
+        var rotate = (this.options.rotateRadian === null) ? Transform.identity : rotateFactor.call(this, position, offset);
 
-        var xScale = transform[0];
-        var yScale = transform[5];
+        var xScale = translateScale[0];
+        var yScale = translateScale[5];
+
+        var transform = Transform.multiply4x4(translateScale, rotate);
 
         target.push({transform: transform, opacity: opacity, target: node.render()});
         var scale = direction === Utility.Direction.X ? xScale : yScale;
@@ -75,19 +83,29 @@ define(function(require, exports, module) {
         }
     }
 
-    function translateAndScale (offset, size) {
+    function rotateFactor (position, offset) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var midpoint = screenWidth / 2;
+        var rotateRadian = this.options.rotateRadian;
+
+        var rad = -(rotateRadian * position / midpoint) + rotateRadian;
+        return Transform.rotateY(rad);
+    }
+
+    function translateAndScale (position, offset) {
         var direction = this.options.direction;
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var startScale = this.options.startScale;
         var endScale = this.options.endScale;
-        var position = offset + size / 2 - this.ourGetPosition();
+        var startDepth = this.options.startDepth;
+        var endDepth = this.options.endDepth;
 
         // for scaling
         var scaleVector = [1, 1, 1];
         var scaling = scalingFactor(screenWidth, startScale, endScale, position);
 
         // for depth
-        var depth = scalingFactor(screenWidth, 1, 200, position);
+        var depth = scalingFactor(screenWidth, startDepth, endDepth, position);
 
         scaleVector[0] = scaling;
         scaleVector[1] = scaling;
@@ -95,20 +113,18 @@ define(function(require, exports, module) {
         // for translation
         var vector = [0, 0, 0];
         vector[direction] = offset;
-            vector[2] = depth;
-
-
-
+        
+        // adding depth
+        vector[2] = depth;
 
         var transform = Transform.thenMove(Transform.scale.apply(null, scaleVector), vector);
         return transform;
     }
 
-    function customFade (offset, size) {
+    function customFade (position) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var startFade = this.options.startFade;
         var endFade = this.options.endFade;
-        var position = offset + size / 2;
 
         var fadeAmt = scalingFactor(screenWidth, startFade, endFade, position);
         return fadeAmt;
