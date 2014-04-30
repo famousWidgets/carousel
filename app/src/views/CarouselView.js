@@ -25,7 +25,17 @@ define(function(require, exports, module) {
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
 
         this._scroller.ourGetPosition = this.getPosition.bind(this);
-        // this._eventInput.on('update', _customHandleMove);
+        this._eventInput.on('update', _customHandleMove.bind(this._scroller));
+        this._eventInput.on('end', _endVelocity.bind(this._scroller));
+    }
+
+    function _customHandleMove (e) {
+        console.log('update: ', e, ' vel: ', e.velocity);
+        this.velocity = e.velocity;
+    }
+
+    function _endVelocity (e) {
+        this.velocity = this.options.maxVelocity;
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -41,7 +51,9 @@ define(function(require, exports, module) {
         endFade: 1,
         startDepth: 1,
         endDepth: 1,
-        rotateRadian: Math.PI / 2
+        rotateRadian: Math.PI / 2,
+        rotateOrigin: 0,
+        maxVelocity: 100
     };
 
     function _output(node, offset, target) {
@@ -87,8 +99,10 @@ define(function(require, exports, module) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var midpoint = screenWidth / 2;
         var rotateRadian = this.options.rotateRadian;
+        var velocity = this.velocity || 1;
 
-        var rad = -(rotateRadian * position / midpoint) + rotateRadian;
+        // var rad = -(rotateRadian * position / midpoint) + rotateRadian;
+        var rad = -(rotateRadian * velocity / this.options.maxVelocity) + rotateRadian;
         return Transform.rotateY(rad);
     }
 
