@@ -38,9 +38,9 @@ define(function(require, exports, module) {
         paginated: false,
         startFade: 1,
         endFade: 1,
-        depth: 200,
+        depth: 1,
         rotateRadian: Math.PI / 2,
-        rotateOrigin: [0, 0.5],
+        rotateOrigin: [0.5, 0.5],
         maxVelocity: 3000
     };
 
@@ -56,14 +56,17 @@ define(function(require, exports, module) {
         var translateZ = _translateZ.call(this, depth);
         var opacity = _customFade.call(this, position);
 
-        var transform = Transform.multiply4x4(translateXY, translateZ);
+        var transform = Transform.multiply(translateXY, translateZ);
 
         target.push({
+            size: size,
             opacity: opacity,
             target: {
-                transform: transform,
-                origin: origin,
-                target: node.render()
+                origin: origin, 
+                target: {
+                    transform: transform,
+                    target: node.render()
+                }
             }
         });
 
@@ -78,7 +81,7 @@ define(function(require, exports, module) {
     //     // TRANSFORM FUNCTIONS
     //     var translateScale = _translateAndScale.call(this, position, offset);
     //     var opacity = _customFade.call(this, position, offset);
-    //     var rotate = (this.options.rotateRadian === null) ? Transform.identity : _rotateFactor.call(this, position, offset);
+    //     var rotate = (this.options.rotateRadian === null) ? Transform.identity : _rotateY.call(this, position, offset);
 
     //     var xScale = translateScale[0];
     //     var yScale = translateScale[5];
@@ -106,9 +109,8 @@ define(function(require, exports, module) {
         }
     }
 
-    function _rotateFactor (position, offset) {
+    function _rotateY () {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
-        var midpoint = screenWidth / 2;
         var rotateRadian = this.options.rotateRadian;
         var velocity = this.velocity || this.options.maxVelocity;
 

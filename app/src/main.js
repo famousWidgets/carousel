@@ -41,7 +41,7 @@ define(function(require, exports, module) {
         rotateRadian: null
     });
 
-    createScrollItemArray(100, 25);
+    createScrollItemArray(100, 50);
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
@@ -58,7 +58,7 @@ define(function(require, exports, module) {
 
     window.carousel = carousel;
     var carouselModifier = new StateModifier({
-        // origin: [0, 0.5]
+        origin: [0, 0.5]
     });
 
     // var blahSurface = new Surface({
@@ -77,7 +77,7 @@ define(function(require, exports, module) {
     //    { duration: 10000 } 
     // );
 
-    mainContext.setPerspective(300);
+    mainContext.setPerspective(200);
     mainContext.add(carouselModifier).add(carousel);
     // mainContext.add(midHMod).add(midHSurface);
     // mainContext.add(blahModifier).add(blahSurface);
