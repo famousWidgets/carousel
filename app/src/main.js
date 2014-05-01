@@ -74,7 +74,7 @@ define(function(require, exports, module) {
 
     // blahModifier.setTransform(
     //    Transform.rotateY(2 * Math.PI),
-    //    { duration: 10000 } 
+    //    { duration: 10000 }
     // );
 
     mainContext.setPerspective(300);
