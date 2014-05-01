@@ -9,6 +9,9 @@ define(function(require, exports, module) {
     var ScrollItemView = require('./ScrollItemView');
     var Group = require('famous/core/Group');
     var OptionsManager = require('famous/core/OptionsManager');
+    var TransitionableTransform = require('famous/transitions/TransitionableTransform');
+    var Transitionable   = require("famous/transitions/Transitionable");
+    var SpringTransition = require("famous/transitions/SpringTransition");
 
     /*
      * @name CarouselView
@@ -17,6 +20,7 @@ define(function(require, exports, module) {
      */
 
     function CarouselView (options) {
+
         ScrollView.apply(this, arguments);
         this.setOptions(CarouselView.DEFAULT_OPTIONS);
         this.setOptions(options);
@@ -25,17 +29,15 @@ define(function(require, exports, module) {
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
 
         // ADD EVENT LISTENERS
-        this._scroller.ourGetPosition = this.getPosition.bind(this);
-        this._eventInput.on('update', _customHandleMove.bind(this._scroller));
-        // this._eventInput.on('end', _endVelocity.bind(this._scroller));
-    }
+        // Registers the method 'SpringTransition' to all Transitionables. Only needs to be called once
+        Transitionable.registerMethod('spring', SpringTransition);
+        // this._scroller.ourGetPosition = this.getPosition.bind(this);
+        // this._eventInput.on('update', _customHandleMove.bind(this._scroller));
+        this.transitionableTransform = new TransitionableTransform();
+        this._scroller.transitionableTransform = this.transitionableTransform;
+        this._eventInput.on('start', _startDrag.bind(this));
+        this._eventInput.on('end', _endDrag.bind(this));
 
-    function _customHandleMove (e) {
-        this.velocity = e.velocity;
-    }
-
-    function _endVelocity (e) {
-        this.velocity = this.options.maxVelocity;
     }
 
     CarouselView.prototype = Object.create(ScrollView.prototype);
@@ -55,26 +57,30 @@ define(function(require, exports, module) {
         // rotateOrigin: 0,
         maxVelocity: 3000
     };
-
+    var d=0;
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
-        var position = offset + size[direction] / 2 - this.ourGetPosition();
+        var position = offset + size[direction] / 2 - this._positionGetter();
 
         // TRANSFORM FUNCTIONS
-        var translateScale = _translateAndScale.call(this, position, offset);
-        var opacity = _customFade.call(this, position, offset);
-        var rotate = (this.options.rotateRadian === null) ? Transform.identity : _rotateFactor.call(this, position, offset);
+        // var translateScale = _translateAndScale.call(this, position, offset);
+        // var opacity = _customFade.call(this, position, offset);
+        // // var rotate = (this.options.rotateRadian === null) ? Transform.identity : _rotateFactor.call(this, position, offset);
 
-        var xScale = translateScale[0];
-        var yScale = translateScale[5];
+        // var xScale = translateScale[0];
+        // var yScale = translateScale[5];
+        var rotateMatrix = this.transitionableTransform.get();
 
-        var transform = Transform.multiply4x4(translateScale, rotate);
+        // var rotate = Transform.rotate.apply(this,rotateMatrix);
+        var translate = Transform.translate(offset, 0, 0);
+        var transform = Transform.multiply(translate, rotateMatrix);
 
-        target.push({transform: transform, opacity: opacity, target: node.render()});
-        var scale = direction === Utility.Direction.X ? xScale : yScale;
 
-        return size[direction] * scale;
+        target.push({transform: transform, target: node.render()});
+        // var scale = direction === Utility.Direction.X ? xScale : yScale;
+
+        return size[direction];
     }
 
     function _scalingFactor (screenWidth, startScale, endScale, currentPosition) {
@@ -100,13 +106,7 @@ define(function(require, exports, module) {
         var midpoint = screenWidth / 2;
         var rotateRadian = this.options.rotateRadian;
         var velocity = this.velocity || this.options.maxVelocity;
-
-        var inQuint = function(t) {
-            return t*t*t*t*t;
-        };
-        // var rad = -(rotateRadian * position / midpoint) + rotateRadian;
-        var finalVelocity = inQuint(Math.abs(velocity));
-        var rad = -(rotateRadian * finalVelocity) + rotateRadian;
+        var rad = -(rotateRadian * velocity / this.options.maxVelocity) + rotateRadian;
         return Transform.rotateY(rad);
     }
 
@@ -153,9 +153,38 @@ define(function(require, exports, module) {
         this.velocity = e.velocity;
     }
 
-    function _endVelocity (e) {
-        this.velocity = this.options.maxVelocity;
+    function _endDrag (e) {
+        this.transitionableTransform.halt();
+        console.log(e);
+        this.transitionableTransform.set(
+            Transform.rotateY(0),
+            {method : 'spring',
+            period : 2000,
+            dampingRatio : 0.25
+        });
+        // Old Rotate
+        // this.transitionableTransform.setRotate([0,Math.PI/4,0],{duration:5000}, function() {
+        //     this.transitionableTransform.setRotate([0,-Math.PI,0],{duration:5000});
+        // }.bind(this));
     }
+
+    function _startDrag (e) {
+        this.transitionableTransform.halt();
+        console.log('starting: ', e);
+        var position;
+        if (e.velocity < 0) {
+            position = 3*Math.PI/4;
+        } else {
+            position = Math.PI/4;
+        }
+        this.transitionableTransform.set(
+            Transform.rotateY(position),
+            {method : 'spring',
+            period : 250,
+            dampingRatio : 0.5
+        });
+
+    };
 
     // COPIED OVER FROM SCROLLER
     function _customInnerRender() {

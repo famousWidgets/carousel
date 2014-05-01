@@ -24,12 +24,12 @@ define(function(require, exports, module) {
 
     var carousel = new CarouselView({
         // endScale: 2,
-        startFade: 0.1
-        // endDepth: 50,
-        // rotateRadian: null
+        // startFade: 0.1,
+        // endDepth: 50
+        rotateRadian: null
     });
 
-    createScrollItemArray(100, 50);
+    createScrollItemArray(100, 100);
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
