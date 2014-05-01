@@ -25,7 +25,7 @@ define(function(require, exports, module) {
         this._scroller.group.add({render: _customInnerRender.bind(this._scroller)});
 
         // ADD EVENT LISTENERS
-        this._scroller.ourGetPosition = this.getPosition.bind(this);
+        // this._scroller.ourGetPosition = this.getPosition.bind(this);
         this._eventInput.on('update', _customHandleMove.bind(this._scroller));
         this._eventInput.on('end', _endVelocity.bind(this._scroller));
     }
@@ -51,7 +51,7 @@ define(function(require, exports, module) {
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var size = node.getSize ? node.getSize() : this._contextSize;
-        var position = offset + size[direction] / 2 - this.ourGetPosition();
+        var position = offset + size[direction] / 2 - this._positionGetter();
 
         // TRANSFORM FUNCTIONS
         var translateScale = _translateAndScale.call(this, position, offset);

@@ -79,6 +79,6 @@ define(function(require, exports, module) {
 
     mainContext.setPerspective(300);
     mainContext.add(carouselModifier).add(carousel);
-    mainContext.add(midHMod).add(midHSurface);
+    // mainContext.add(midHMod).add(midHSurface);
     // mainContext.add(blahModifier).add(blahSurface);
 });
