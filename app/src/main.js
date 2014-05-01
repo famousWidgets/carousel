@@ -36,8 +36,8 @@ define(function(require, exports, module) {
 
     var carousel = new CarouselView({
         startFade: 0.1,
-        // depth: 100,
-        rotateRadian: null
+        depth: 200
+        // rotateRadian: null
     });
 
     createScrollItemArray(100, 50);
