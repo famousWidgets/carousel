@@ -12,10 +12,22 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
     var scrollItemViews = [];
 
+    // var createScrollItemArray = function (num, size) {
+    //     for (var i = 0; i < num; i += 1) {
+    //         var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
+    //         var scrollItemView = new ScrollItemView(color, size);
+
+    //         scrollItemViews.push(scrollItemView);
+    //         carousel.subscribe(scrollItemView);
+    //     }
+    // };
+
     var createScrollItemArray = function (num, size) {
         for (var i = 0; i < num; i += 1) {
-            var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var scrollItemView = new ScrollItemView(color, size);
+            var scrollItemView = new Surface({
+                content: "<img src='../content/images/famous_logo.png' height='" + size + "' width='" + size + "'>",
+                size: [size, size]
+            });
 
             scrollItemViews.push(scrollItemView);
             carousel.subscribe(scrollItemView);
@@ -23,10 +35,10 @@ define(function(require, exports, module) {
     };
 
     var carousel = new CarouselView({
-        // endScale: 2,
-        // startFade: 0.1,
-        // endDepth: 50
-        // rotateRadian: null
+        endScale: 2,
+        startFade: 0.1,
+        // endDepth: 50,
+        rotateRadian: null
     });
 
     createScrollItemArray(100, 100);
@@ -62,7 +74,7 @@ define(function(require, exports, module) {
 
     // blahModifier.setTransform(
     //    Transform.rotateY(2 * Math.PI),
-    //    { duration: 10000 } 
+    //    { duration: 10000 }
     // );
 
     mainContext.setPerspective(300);
