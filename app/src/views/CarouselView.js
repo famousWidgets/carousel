@@ -46,6 +46,10 @@ define(function(require, exports, module) {
         startFade: 1,
         endFade: 1,
         depth: 1,
+        startDamp: 0.25,
+        endDamp: 0.25,
+        startPeriod: 250,
+        endPeriod: 2000,
         rotateRadian: Math.PI / 2,
         rotateOrigin: [0.5, 0.5],
         maxVelocity: 3000
@@ -60,11 +64,12 @@ define(function(require, exports, module) {
 
         // TRANSFORM FUNCTIONS
         var translateXY = _translateXY.call(this, offset);
-        var translateZ = _translateZ.call(this, depth);
+        var translateZ = _translateZ.call(this, depth, position);
         var opacity = _customFade.call(this, position);
         var rotateMatrix = this.transitionableTransform.get();
 
-        var transform = Transform.multiply(translateXY, translateZ, rotateMatrix);
+        var xyzTranslation = Transform.multiply4x4(translateXY, translateZ);
+        var transform = Transform.multiply4x4(xyzTranslation, rotateMatrix);
 
         target.push({
             size: size,
@@ -88,8 +93,12 @@ define(function(require, exports, module) {
         return Transform.translate.apply(null, vector);
     }
 
-    function _translateZ (depth) {
-        return Transform.translate.apply(null, [0, 0, depth]);
+    function _translateZ (depth, position) {
+        var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var lowerBound = 0.45 * screenWidth;
+        var upperBound = 0.55 * screenWidth;
+
+        return (position >= lowerBound && position <= upperBound) ? Transform.translate.apply(null, [0, 0, depth]) : Transform.identity;
     }
 
     function _customFade (position) {
@@ -127,8 +136,8 @@ define(function(require, exports, module) {
             Transform.rotateY(position),
             {
                 method : 'spring',
-                period : 250,
-                dampingRatio : 0.5
+                period : this.options.startPeriod,
+                dampingRatio : this.options.startDamp
             }
         );
     }
@@ -140,8 +149,8 @@ define(function(require, exports, module) {
             Transform.rotateY(0),
             {
                 method : 'spring',
-                period : 2000,
-                dampingRatio : 0.25
+                period : this.options.endPeriod,
+                dampingRatio : this.options.endDamp
             }
         );
     }

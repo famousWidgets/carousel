@@ -36,7 +36,7 @@ define(function(require, exports, module) {
 
     var carousel = new CarouselView({
         startFade: 0.1,
-        depth: 200
+        depth: 300
         // rotateRadian: null
     });
 
@@ -60,7 +60,7 @@ define(function(require, exports, module) {
         origin: [0, 0.5]
     });
 
-    mainContext.setPerspective(200);
+    mainContext.setPerspective(500);
     mainContext.add(carouselModifier).add(carousel);
     mainContext.add(midHMod).add(midHSurface);
 });
