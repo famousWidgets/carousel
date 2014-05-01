@@ -53,7 +53,9 @@ define(function(require, exports, module) {
         endPeriod: 2000,
         rotateRadian: Math.PI / 2,
         rotateOrigin: [0.5, 0.5],
-        maxVelocity: 3000
+        maxVelocity: 3000,
+        lowerBound: 0.45,
+        upperBound: 0.55
     };
 
     function _output(node, offset, target) {
@@ -99,8 +101,8 @@ define(function(require, exports, module) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var startDepth = this.options.startDepth;
         var endDepth = this.options.endDepth;
-        var lowerBound = 0.45 * screenWidth;
-        var upperBound = 0.55 * screenWidth;
+        var lowerBound = this.options.lowerBound * screenWidth;
+        var upperBound = this.options.upperBound * screenWidth;
 
         if (position >= lowerBound && position <= upperBound) {
             // var width = upperBound - lowerBound;
