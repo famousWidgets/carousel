@@ -45,7 +45,8 @@ define(function(require, exports, module) {
         paginated: false,
         startFade: 1,
         endFade: 1,
-        depth: 1,
+        startDepth: 1,
+        endDepth: 1,
         startDamp: 0.25,
         endDamp: 0.25,
         startPeriod: 250,
@@ -57,16 +58,17 @@ define(function(require, exports, module) {
 
     function _output(node, offset, target) {
         var direction = this.options.direction;
-        var depth = this.options.depth;
+        var depth = this.options.startDepth;
         var origin = this.options.rotateOrigin;
+        var rotateRadian = this.options.rotateRadian;
         var size = node.getSize ? node.getSize() : this._contextSize;
         var position = offset + size[direction] / 2 - this._positionGetter();
 
         // TRANSFORM FUNCTIONS
         var translateXY = _translateXY.call(this, offset);
-        var translateZ = _translateZ.call(this, depth, position);
+        var translateZ = _translateZ.call(this, position);
         var opacity = _customFade.call(this, position);
-        var rotateMatrix = this.transitionableTransform.get();
+        var rotateMatrix = (rotateRadian === null) ? Transform.identity : this.transitionableTransform.get();
 
         var xyzTranslation = Transform.multiply4x4(translateXY, translateZ);
         var transform = Transform.multiply4x4(xyzTranslation, rotateMatrix);
@@ -93,12 +95,21 @@ define(function(require, exports, module) {
         return Transform.translate.apply(null, vector);
     }
 
-    function _translateZ (depth, position) {
+    function _translateZ (position) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
+        var startDepth = this.options.startDepth;
+        var endDepth = this.options.endDepth;
         var lowerBound = 0.45 * screenWidth;
         var upperBound = 0.55 * screenWidth;
 
-        return (position >= lowerBound && position <= upperBound) ? Transform.translate.apply(null, [0, 0, depth]) : Transform.identity;
+        if (position >= lowerBound && position <= upperBound) {
+            // var width = upperBound - lowerBound;
+            var scale = _scalingFactor(screenWidth, startDepth, endDepth, position);
+            return Transform.translate.apply(null, [0, 0, endDepth * scale]);
+        } else {
+            return Transform.identity;
+        }
+        // return (position >= lowerBound && position <= upperBound) ? Transform.translate.apply(null, [0, 0, depth]) : Transform.identity;
     }
 
     function _customFade (position) {
