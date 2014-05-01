@@ -35,9 +35,8 @@ define(function(require, exports, module) {
     // };
 
     var carousel = new CarouselView({
-        // endScale: 2,
         startFade: 0.1,
-        // endDepth: 50,
+        // depth: 100,
         rotateRadian: null
     });
 
@@ -45,40 +44,23 @@ define(function(require, exports, module) {
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
-    // var midHSurface = new Surface({
-    //     size : [5, window.innerHeight],
-    //     properties: {
-    //         backgroundColor: 'red'
-    //     }
-    // });
+    var midHSurface = new Surface({
+        size : [5, window.innerHeight],
+        properties: {
+            backgroundColor: 'red'
+        }
+    });
 
-    // var midHMod = new StateModifier({
-    //     origin: [0.5, 0]
-    // });
+    var midHMod = new StateModifier({
+        origin: [0.5, 0]
+    });
 
     window.carousel = carousel;
     var carouselModifier = new StateModifier({
         origin: [0, 0.5]
     });
 
-    // var blahSurface = new Surface({
-    //     size: [100, 100],
-    //     properties: {
-    //         backgroundColor: 'red'
-    //     }
-    // });
-
-    // var blahModifier = new StateModifier({
-    //     origin: [0.5, 0.5]
-    // });
-
-    // blahModifier.setTransform(
-    //    Transform.rotateY(2 * Math.PI),
-    //    { duration: 10000 } 
-    // );
-
     mainContext.setPerspective(200);
     mainContext.add(carouselModifier).add(carousel);
-    // mainContext.add(midHMod).add(midHSurface);
-    // mainContext.add(blahModifier).add(blahSurface);
+    mainContext.add(midHMod).add(midHSurface);
 });
