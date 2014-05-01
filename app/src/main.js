@@ -41,7 +41,7 @@ define(function(require, exports, module) {
         rotateRadian: null
     });
 
-    createScrollItemArray(100, 100);
+    createScrollItemArray(100, 25);
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
@@ -58,7 +58,7 @@ define(function(require, exports, module) {
 
     window.carousel = carousel;
     var carouselModifier = new StateModifier({
-        origin: [0, 0.5]
+        // origin: [0, 0.5]
     });
 
     // var blahSurface = new Surface({
