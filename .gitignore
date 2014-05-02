@@ -20,3 +20,6 @@ app/lib
 #################
 app/content/images/**/*
 !app/content/images/famous_logo.png
+
+# examples #
+examples

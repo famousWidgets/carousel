@@ -34,14 +34,28 @@ define(function(require, exports, module) {
 
     // DEMO SCENARIOS
 
-    // BASELINE SCENARIO
-    var carousel = new CarouselView({
-        // startFade: 0.1,
-        // endDepth: 20,
-        // lowerBound: 0,
-        // upperBound: 1
-        rotateRadian: null
-    });
+    // // BASELINE SCENARIO
+    // var carousel = new CarouselView({
+    //     startFade: 0.1,
+    //     // endDepth: 20,
+    //     // lowerBound: 0,
+    //     // upperBound: 1
+
+    //     rotateRadian: null
+    // });
+
+    // // greg custom depth scaling check
+    // var carousel = new CarouselView({
+    //     // startDamp: 0.5,             // 0.5
+    //     // endDamp: 0.3,               // 0.1
+    //     // startPeriod: 100,           // 250
+    //     // endPeriod: 1000,            // 2000
+    //     // rotateRadian: Math.PI / 2,  // Math.PI / 2
+    //     // maxVelocity: 10
+    //     lowerBound: 0.25,
+    //     upperBound: 0.5,
+    //     endDepth: 200
+    // });
 
     // FADING SCENARIO - with baseline
     // var carousel = new CarouselView({
@@ -60,34 +74,34 @@ define(function(require, exports, module) {
     // });
 
     // EVERYTHING SCENARIO
-    // var carousel = new CarouselView({
-    //     startFade: 0.1,
-    //     endDepth: 20,
-    //     lowerBound: 0,
-    //     upperBound: 1
-    // });
+    var carousel = new CarouselView({
+        startFade: 0.1,
+        endDepth: 20,
+        lowerBound: 0.25,
+        upperBound: 0.75
+    });
 
 
     var carouselModifier = new StateModifier({
         origin: [0, 0.5]
     });
 
-    createScrollItemArray(100, 50);
+    createScrollItemArray(100, 100);
     carousel.sequenceFrom(scrollItemViews);
 
     // adding a visual on screen for midpoint
-    // var midHSurface = new Surface({
-    //     size : [5, window.innerHeight],
-    //     properties: {
-    //         backgroundColor: 'red'
-    //     }
-    // });
+    var midHSurface = new Surface({
+        size : [5, window.innerHeight],
+        properties: {
+            backgroundColor: 'red'
+        }
+    });
 
-    // var midHMod = new StateModifier({
-    //     origin: [0.5, 0]
-    // });
+    var midHMod = new StateModifier({
+        origin: [0.5, 0]
+    });
 
     mainContext.setPerspective(1000);
     mainContext.add(carouselModifier).add(carousel);
-    // mainContext.add(midHMod).add(midHSurface);
+    mainContext.add(midHMod).add(midHSurface);
 });
