@@ -32,7 +32,7 @@ define(function(require, exports, module) {
         // Registers the method 'SpringTransition' to all Transitionables. Only needs to be called once
         this.transitionableTransform = new TransitionableTransform();
         this._scroller.transitionableTransform = this.transitionableTransform;
-        this._eventInput.on('start', _startDrag.bind(this));
+        this._eventInput.on('update', _updateDrag.bind(this));
         this._eventInput.on('end', _endDrag.bind(this));
         Transitionable.registerMethod('spring', SpringTransition);
     }
@@ -47,13 +47,13 @@ define(function(require, exports, module) {
         endFade: 1,
         startDepth: 1,
         endDepth: 1,
-        startDamp: 0.25,
-        endDamp: 0.25,
+        startDamp: 0.5,
+        endDamp: 0.1,
         startPeriod: 250,
         endPeriod: 2000,
         rotateRadian: Math.PI / 2,
         rotateOrigin: [0.5, 0.5],
-        maxVelocity: 3000,
+        maxVelocity: 30,
         lowerBound: 0.45,
         upperBound: 0.55
     };
@@ -97,21 +97,19 @@ define(function(require, exports, module) {
         return Transform.translate.apply(null, vector);
     }
 
-    function _translateZ (position) {
+    function _translateZ (midpoint) {
         var screenWidth = this.options.direction === Utility.Direction.X ? window.innerWidth : window.innerHeight;
         var startDepth = this.options.startDepth;
         var endDepth = this.options.endDepth;
         var lowerBound = this.options.lowerBound * screenWidth;
         var upperBound = this.options.upperBound * screenWidth;
 
-        if (position >= lowerBound && position <= upperBound) {
-            // var width = upperBound - lowerBound;
-            var scale = _scalingFactor(screenWidth, startDepth, endDepth, position);
+        if (midpoint >= lowerBound && midpoint <= upperBound) {
+            var scale = _scalingFactor(screenWidth, startDepth, endDepth, midpoint);
             return Transform.translate.apply(null, [0, 0, endDepth * scale]);
         } else {
             return Transform.identity;
         }
-        // return (position >= lowerBound && position <= upperBound) ? Transform.translate.apply(null, [0, 0, depth]) : Transform.identity;
     }
 
     function _customFade (position) {
@@ -136,17 +134,24 @@ define(function(require, exports, module) {
         }
     }
 
-    function _startDrag (e) {
+    function _updateDrag (e) {
+        var maxVelocity = this.options.maxVelocity;
         this.transitionableTransform.halt();
-        console.log('starting: ', e);
+        console.log('before changing e:', e.velocity);
+
         var position;
         if (e.velocity < 0) {
-            position = 3*Math.PI/4;
-        } else {
             position = Math.PI/4;
+        } else {
+            position = -Math.PI/4;
         }
+
+        if (Math.abs(e.velocity) >= maxVelocity) {
+            e.velocity = maxVelocity;
+        }
+
         this.transitionableTransform.set(
-            Transform.rotateY(position),
+            Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
             {
                 method : 'spring',
                 period : this.options.startPeriod,
