@@ -34,13 +34,8 @@ define(function(require, exports, module) {
 
     // DEMO SCENARIOS
 
-    // // BASELINE SCENARIO
+    // BASELINE SCENARIO
     // var carousel = new CarouselView({
-    //     startFade: 0.1,
-    //     // endDepth: 20,
-    //     // lowerBound: 0,
-    //     // upperBound: 1
-
     //     rotateRadian: null
     // });
 
@@ -76,9 +71,9 @@ define(function(require, exports, module) {
     // EVERYTHING SCENARIO
     var carousel = new CarouselView({
         startFade: 0.1,
-        endDepth: 20,
-        lowerBound: 0.25,
-        upperBound: 0.75
+        endDepth: 200,
+        lowerBound: 0.35,
+        upperBound: 0.65
     });
 
 
