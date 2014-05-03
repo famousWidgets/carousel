@@ -20,7 +20,6 @@ define(function(require, exports, module) {
      */
 
     function CarouselView (options) {
-
         ScrollView.apply(this, arguments);
         this.setOptions(CarouselView.DEFAULT_OPTIONS);
         this.setOptions(options);
@@ -48,20 +47,19 @@ define(function(require, exports, module) {
         startDepth: 1,
         endDepth: 1,
         startDamp: 0.5,
-        endDamp: 0.1,
+        endDamp: 0.05,
         startPeriod: 250,
-        endPeriod: 2000,
+        endPeriod: 3000,
         rotateRadian: Math.PI / 2,
         rotateOrigin: [0.5, 0.5],
         maxVelocity: 30,
         lowerBound: 0.45,
-        upperBound: 0.55,
-        tick : 0
+        upperBound: 0.55
     };
 
-    var tick = 0;
+    // var obj = {};
+    // window.obj = obj;
     function _output(node, offset, target) {
-        tick++
         var direction = this.options.direction;
         var depth = this.options.startDepth;
         var origin = this.options.rotateOrigin;
@@ -69,8 +67,9 @@ define(function(require, exports, module) {
         var size = node.getSize ? node.getSize() : this._contextSize;
         var position = offset + size[direction] / 2 - this._positionGetter();
 
-        // if (tick % 60 === 0) {
-        //     console.log( '\n*** start*** \n', 'pos: ', position, 'off: ', offset, 'dir: ', direction, 'posGet: ', this._positionGetter());
+        // Investigating how to swivel the surface on entering screen
+        // if (!obj[node.index]) {
+        //     obj[node.index] = node;
         // }
 
         // TRANSFORM FUNCTIONS
@@ -112,40 +111,19 @@ define(function(require, exports, module) {
         var lowerBound = this.options.lowerBound * screenWidth;
         var upperBound = this.options.upperBound * screenWidth;
 
-        // if (tick % 60 === 0) {
-        //     console.log('lb: ', this.options.lowerBound, lowerBound,'ub: ', this.options.upperBound, upperBound, 'sw: ', screenWidth);
-        // }
-
         var scale = _scalingFactor(screenWidth, startDepth, endDepth, midpoint, upperBound, lowerBound);
         return Transform.translate.apply(null, [0, 0, scale]);
-
-        // if (midpoint >= lowerBound && midpoint <= upperBound) {
-        //     var scale = _scalingFactor(screenWidth, startDepth, endDepth, midpoint);
-        //     return Transform.translate.apply(null, [0, 0, endDepth * scale]);
-        // } else {
-        //     return Transform.identity;
-        // }
     }
 
     function _scalingFactor (screenWidth, startScale, endScale, currentPosition, upperB, lowerB) {
         lowerB = lowerB || 0;
-        upperB = upperB || screenWidth
+        upperB = upperB || screenWidth;
         var midpoint = (upperB + lowerB) / 2;
-        // if (tick % 60 === 0) {
-        //     console.log('mid: ', midpoint, 'current P: ', currentPosition);
-        //     console.log(screenWidth, startScale, endScale, currentPosition, lowerB, upperB, '\n *** end ***');
-        // }
 
         if (currentPosition >= lowerB && currentPosition <= midpoint) {
-            // console.log('executed');
-            var scale = 2*(endScale - startScale)/(upperB - lowerB) * currentPosition + (endScale  - (upperB + lowerB) * (endScale - startScale)/(upperB - lowerB));
-            // tick % 60 === 0 ? console.log('scale: ', scale) : false;
-            return scale;
-
+            return 2 * (endScale - startScale) / (upperB - lowerB) * currentPosition + (endScale  - (upperB + lowerB) * (endScale - startScale) / (upperB - lowerB));
         } else if (currentPosition > midpoint && currentPosition <= upperB) {
-            var scale = 2*(startScale - endScale)/(upperB - lowerB) * currentPosition + (endScale - (startScale - endScale)*(upperB + lowerB)/(upperB - lowerB));
-            return scale;
-
+            return 2 * (startScale - endScale) / (upperB - lowerB) * currentPosition + (endScale - (startScale - endScale) * (upperB + lowerB) / (upperB - lowerB));
         } else {
             return startScale;
         }
@@ -158,26 +136,9 @@ define(function(require, exports, module) {
         return _scalingFactor(screenWidth, startFade, endFade, position);
     }
 
-
-    // function _scalingFactor (screenWidth, startScale, endScale, currentPosition) {
-    //     // currentPosition will be along x or y axis
-    //     var midpoint = screenWidth / 2;
-    //     if (currentPosition <= midpoint && currentPosition >= 0) {
-    //         // from 0 to midpoint
-    //         return ((endScale - startScale) / midpoint) * currentPosition + startScale;
-    //     } else if (currentPosition > midpoint && currentPosition <= screenWidth){
-    //         // from midpoint to screenWidth
-    //         return (-(endScale - startScale) / midpoint) * currentPosition + (2 * (endScale - startScale) + startScale);
-    //     } else {
-    //         // when its offscreen
-    //         return startScale;
-    //     }
-    // }
-
     function _updateDrag (e) {
         var maxVelocity = this.options.maxVelocity;
         this.transitionableTransform.halt();
-        // console.log('before changing e:', e.velocity);
 
         var position;
         if (e.velocity < 0) {
@@ -191,7 +152,8 @@ define(function(require, exports, module) {
         }
 
         this.transitionableTransform.set(
-            Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
+            Transform.rotateY(position * e.velocity),
+            // Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
             {
                 method : 'spring',
                 period : this.options.startPeriod,
@@ -202,7 +164,6 @@ define(function(require, exports, module) {
 
     function _endDrag (e) {
         this.transitionableTransform.halt();
-        // console.log('ending', e);
         this.transitionableTransform.set(
             Transform.rotateY(0),
             {
@@ -249,12 +210,14 @@ define(function(require, exports, module) {
         var edgeSize = (nodesSize !== undefined && nodesSize < clipSize) ? nodesSize : clipSize;
 
         if (!currNode && offset - position <= edgeSize) {
+            // console.log('Hit right edge');
             scroller._onEdge = 1;
             scroller._eventOutput.emit('edgeHit', {
                 position: offset - edgeSize
             });
         }
         else if (!scroller._node.getPrevious() && position <= 0) {
+            // console.log('Hit left edge');
             scroller._onEdge = -1;
             scroller._eventOutput.emit('edgeHit', {
                 position: 0
