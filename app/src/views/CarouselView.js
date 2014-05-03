@@ -20,7 +20,6 @@ define(function(require, exports, module) {
      */
 
     function CarouselView (options) {
-
         ScrollView.apply(this, arguments);
         this.setOptions(CarouselView.DEFAULT_OPTIONS);
         this.setOptions(options);
@@ -48,9 +47,9 @@ define(function(require, exports, module) {
         startDepth: 1,
         endDepth: 1,
         startDamp: 0.5,
-        endDamp: 0.1,
+        endDamp: 0.05,
         startPeriod: 250,
-        endPeriod: 2000,
+        endPeriod: 3000,
         rotateRadian: Math.PI / 2,
         rotateOrigin: [0.5, 0.5],
         maxVelocity: 30,
@@ -58,6 +57,8 @@ define(function(require, exports, module) {
         upperBound: 0.55
     };
 
+    // var obj = {};
+    // window.obj = obj;
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var depth = this.options.startDepth;
@@ -65,6 +66,11 @@ define(function(require, exports, module) {
         var rotateRadian = this.options.rotateRadian;
         var size = node.getSize ? node.getSize() : this._contextSize;
         var position = offset + size[direction] / 2 - this._positionGetter();
+
+        // Investigating how to swivel the surface on entering screen
+        // if (!obj[node.index]) {
+        //     obj[node.index] = node;
+        // }
 
         // TRANSFORM FUNCTIONS
         var translateXY = _translateXY.call(this, offset);
@@ -146,7 +152,8 @@ define(function(require, exports, module) {
         }
 
         this.transitionableTransform.set(
-            Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
+            Transform.rotateY(position * e.velocity),
+            // Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
             {
                 method : 'spring',
                 period : this.options.startPeriod,
@@ -203,12 +210,14 @@ define(function(require, exports, module) {
         var edgeSize = (nodesSize !== undefined && nodesSize < clipSize) ? nodesSize : clipSize;
 
         if (!currNode && offset - position <= edgeSize) {
+            // console.log('Hit right edge');
             scroller._onEdge = 1;
             scroller._eventOutput.emit('edgeHit', {
                 position: offset - edgeSize
             });
         }
         else if (!scroller._node.getPrevious() && position <= 0) {
+            // console.log('Hit left edge');
             scroller._onEdge = -1;
             scroller._eventOutput.emit('edgeHit', {
                 position: 0
