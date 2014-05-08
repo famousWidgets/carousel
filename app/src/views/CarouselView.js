@@ -152,7 +152,7 @@ define(function(require, exports, module) {
         }
 
         this.transitionableTransform.set(
-            Transform.rotateY(position * e.velocity),
+            Transform.rotateY(position * Math.abs(e.velocity)),
             // Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
             {
                 method : 'spring',
