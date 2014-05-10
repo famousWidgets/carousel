@@ -40,25 +40,25 @@ define(function(require, exports, module) {
     CarouselView.prototype.constructor = CarouselView;
 
     CarouselView.DEFAULT_OPTIONS = {
+        drag: 0.0001,
+        edgeGrip: 0.00001,
         direction: Utility.Direction.X,
         paginated: false,
         startFade: 1,
         endFade: 1,
         startDepth: 1,
         endDepth: 1,
-        startDamp: 0.5,
-        endDamp: 0.05,
+        startDamp: 0.05,
+        endDamp: 0.005,
         startPeriod: 250,
         endPeriod: 3000,
         rotateRadian: Math.PI / 2,
         rotateOrigin: [0.5, 0.5],
-        maxVelocity: 30,
+        maxVelocity: 10,
         lowerBound: 0.45,
         upperBound: 0.55
     };
 
-    // var obj = {};
-    // window.obj = obj;
     function _output(node, offset, target) {
         var direction = this.options.direction;
         var depth = this.options.startDepth;
@@ -67,10 +67,6 @@ define(function(require, exports, module) {
         var size = node.getSize ? node.getSize() : this._contextSize;
         var position = offset + size[direction] / 2 - this._positionGetter();
 
-        // Investigating how to swivel the surface on entering screen
-        // if (!obj[node.index]) {
-        //     obj[node.index] = node;
-        // }
 
         // TRANSFORM FUNCTIONS
         var translateXY = _translateXY.call(this, offset);
@@ -85,7 +81,7 @@ define(function(require, exports, module) {
             size: size,
             opacity: opacity,
             target: {
-                origin: origin, 
+                origin: origin,
                 target: {
                     transform: transform,
                     target: node.render()
@@ -153,7 +149,6 @@ define(function(require, exports, module) {
 
         this.transitionableTransform.set(
             Transform.rotateY(position * Math.abs(e.velocity)),
-            // Transform.rotateY(position * Math.abs(e.velocity / maxVelocity)),
             {
                 method : 'spring',
                 period : this.options.startPeriod,
