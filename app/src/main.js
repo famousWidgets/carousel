@@ -105,15 +105,15 @@ define(function(require, exports, module) {
 
     // HR DEMO
     // 1) Fading colors with square views
-    // var createScrollItemArray = function (num, size) {
-    //     for (var i = 0; i < num; i += 1) {
-    //         var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-    //         var scrollItemView = new ScrollItemView(color, size);
-    //         scrollItemViews.push(scrollItemView);
-    // //         carousel.subscribe(scrollItemView);
-    // //     }
-    // // };
-    
+    var createScrollItemArray = function (num, size) {
+        for (var i = 0; i < num; i += 1) {
+            var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
+            var scrollItemView = new ScrollItemView(color, size);
+            scrollItemViews.push(scrollItemView);
+            carousel.subscribe(scrollItemView);
+        }
+    };
+
     // // 2) Z index with hack reactor logo
     // var createScrollItemArray = function (num, size) {
     //     for (var i = 0; i < num; i += 1) {
@@ -130,24 +130,24 @@ define(function(require, exports, module) {
     // };
 
     // 3) Physics engine with z-index and doge pic
-    var createScrollItemArray = function (num, size) {
-        for (var i = 0; i < num; i += 1) {
-            var scrollItemView = new Surface({
-                content: "<img src='../content/images/doge.jpeg' height='" + size + "' width='" + size + "'>",
-                size: [size, size]
-            });
-            scrollItemView.on('click', function () {
-                alert('Hello Hack Reactor!');
-            });
-            scrollItemViews.push(scrollItemView);
-            carousel.subscribe(scrollItemView);
-        }
-    };
+    // var createScrollItemArray = function (num, size) {
+    //     for (var i = 0; i < num; i += 1) {
+    //         var scrollItemView = new Surface({
+    //             size: [size, size]
+    //         });
+    //         scrollItemView.on('click', function () {
+    //             alert('Hello Hack Reactor!');
+    //         });
+    //         scrollItemViews.push(scrollItemView);
+    //         carousel.subscribe(scrollItemView);
+    //     }
+    // };
 
     // CONFIGURATIONS
     // 1) Fading colors with square views
     var carousel = new CarouselView({
         startFade: 0.1,
+        endFade: 0.1,
         rotateRadian: null
     });
 
