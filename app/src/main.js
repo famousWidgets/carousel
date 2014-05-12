@@ -1,3 +1,38 @@
+/**
+ * Copyright (c) 2014 Famous Industries, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * @license MIT
+ */
+
+ /**
+  * Carousel View
+  * -------
+  *
+  * Carousel View extends Scroll View by adding functionality to enhance the scrolling effects on renderables laid out by Scroll View.
+  * There are different options you can pass into Carousel View to customize its functionality.
+  *
+  * In this example, we create an array of surfaces and sequence it into Carousel View.
+  *
+  */
+
 /*globals define*/
 define(function(require, exports, module) {
     'use strict';
@@ -5,187 +40,46 @@ define(function(require, exports, module) {
     var Surface = require('famous/core/Surface');
     var StateModifier = require('famous/modifiers/StateModifier');
     var CarouselView = require('./views/CarouselView');
-    var ScrollItemView = require('./views/ScrollItemView');
     var Utility = require('famous/utilities/Utility');
     var Transform = require('famous/core/Transform');
 
     var mainContext = Engine.createContext();
-    var scrollItemViews = [];
+    var surfaces = [];
 
-    // DEMO SCENARIOS
-
-    // 1) Background Surfaces
-
-    // Rainbow Colors with Views
-    // var createScrollItemArray = function (num, size) {
-    //     for (var i = 0; i < num; i += 1) {
-    //         var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-    //         var scrollItemView = new ScrollItemView(color, size);
-    //         scrollItemViews.push(scrollItemView);
-    //         carousel.subscribe(scrollItemView);
-    //     }
-    // };
-
-    // Rainbow Colors with Surfaces
-    // var createScrollItemArray = function (num, size) {
-    //     for (var i = 0; i < num; i += 1) {
-    //         var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-    //         var surface = new Surface({
-    //             content: 'Hello Hack Reactor',
-    //             size: [size, size],
-    //             properties: {
-    //                 backgroundColor: color
-    //             }
-    //         });
-    //         scrollItemViews.push(surface);
-    //         carousel.subscribe(surface);
-    //     }
-    // };
-
-    // Background Images with Click Listener
-    // var createScrollItemArray = function (num, size) {
-    //     for (var i = 0; i < num; i += 1) {
-    //         var scrollItemView = new Surface({
-    //             content: "<img src='../content/images/hack-reactor.png' height='" + size + "' width='" + size + "'>",
-    //             size: [size, size]
-    //         });
-    //         scrollItemView.on('click', function () {
-    //             alert('Hello Hack Reactor!');
-    //         });
-    //         scrollItemViews.push(scrollItemView);
-    //         carousel.subscribe(scrollItemView);
-    //     }
-    // };
-
-
-    // 2) Different Configurations
-
-    // Baseline scenario
-    // var carousel = new CarouselView({
-    //     rotateRadian: null
-    // });
-
-    // Fading - with baseline
-    // var carousel = new CarouselView({
-    //     startFade: 0.1,
-    //     rotateRadian: null
-    // });
-
-    // Z Index - with baseline
-    // var carousel = new CarouselView({
-    //     endDepth: 20,
-    //     rotateRadian: null
-    // });
-
-    // Physics Engine - with baseline
-    // var carousel = new CarouselView({
-    // });
-
-    // Everything Scenario
-    // var carousel = new CarouselView({
-    //     startFade: 0.1,
-    //     endDepth: 200,
-    //     lowerBound: 0.35,
-    //     upperBound: 0.65
-    // });
-
-    // Greg - custom depth scaling
-    // var carousel = new CarouselView({
-    //     // startDamp: 0.5,             // 0.5
-    //     // endDamp: 0.3,               // 0.1
-    //     // startPeriod: 100,           // 250
-    //     // endPeriod: 1000,            // 2000
-    //     // rotateRadian: Math.PI / 2,  // Math.PI / 2
-    //     // maxVelocity: 10
-    //     lowerBound: 0.25,
-    //     upperBound: 0.5,
-    //     endDepth: 200
-    // });
-
-
-    // HR DEMO
-    // 1) Fading colors with square views
-    var createScrollItemArray = function (num, size) {
+    var createSurfaceArray = function (num, size) {
         for (var i = 0; i < num; i += 1) {
             var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var scrollItemView = new ScrollItemView(color, size);
-            scrollItemViews.push(scrollItemView);
-            carousel.subscribe(scrollItemView);
+            var surface = new Surface({
+                content: '<p style="text-align: center;">Are you Famo.us?</p>',
+                size: [size, size],
+                properties: {
+                    backgroundColor: color
+                }
+            });
+            surfaces.push(surface);
+            carousel.subscribe(surface);
         }
     };
 
-    // // 2) Z index with hack reactor logo
-    // var createScrollItemArray = function (num, size) {
-    //     for (var i = 0; i < num; i += 1) {
-    //         var scrollItemView = new Surface({
-    //             content: "<img src='../content/images/hack-reactor.png' height='" + size + "' width='" + size + "'>",
-    //             size: [size, size]
-    //         });
-    //         scrollItemView.on('click', function () {
-    //             alert('Hello Hack Reactor!');
-    //         });
-    //         scrollItemViews.push(scrollItemView);
-    //         carousel.subscribe(scrollItemView);
-    //     }
-    // };
-
-    // 3) Physics engine with z-index and doge pic
-    // var createScrollItemArray = function (num, size) {
-    //     for (var i = 0; i < num; i += 1) {
-    //         var scrollItemView = new Surface({
-    //             size: [size, size]
-    //         });
-    //         scrollItemView.on('click', function () {
-    //             alert('Hello Hack Reactor!');
-    //         });
-    //         scrollItemViews.push(scrollItemView);
-    //         carousel.subscribe(scrollItemView);
-    //     }
-    // };
-
-    // CONFIGURATIONS
-    // 1) Fading colors with square views
     var carousel = new CarouselView({
-        startFade: 0.1,
-        endFade: 0.1,
-        rotateRadian: null
+        startDamp: 0.5,
+        endDamp: 0.3,
+        startPeriod: 100,
+        endPeriod: 1000,
+        rotateRadian: Math.PI / 2,
+        maxVelocity: 10,
+        lowerBound: 0.25,
+        upperBound: 0.5,
+        endDepth: 200
     });
-
-    // 2) Z index with hack reactor logo
-    // var carousel = new CarouselView({
-    //     endDepth: 100,
-    //     rotateRadian: null
-    // });
-
-    // 3) Physics engine with z-index and doge pic
-    // var carousel = new CarouselView({
-    //     startFade: 0.1,
-    //     endDepth: 200,
-    //     lowerBound: 0.35,
-    //     upperBound: 0.65
-    // });
-
 
     var carouselModifier = new StateModifier({
         origin: [0, 0.5]
     });
 
-    createScrollItemArray(100, 150);
-    carousel.sequenceFrom(scrollItemViews);
-
-    // adding a visual on screen for midpoint
-    // var midHSurface = new Surface({
-    //     size : [5, window.innerHeight],
-    //     properties: {
-    //         backgroundColor: 'red'
-    //     }
-    // });
-
-    // var midHMod = new StateModifier({
-    //     origin: [0.5, 0]
-    // });
+    createSurfaceArray(100, 150);
+    carousel.sequenceFrom(surfaces);
 
     mainContext.setPerspective(500);
     mainContext.add(carouselModifier).add(carousel);
-    // mainContext.add(midHMod).add(midHSurface);
 });
