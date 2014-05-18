@@ -40,46 +40,25 @@ define(function(require, exports, module) {
     var Surface = require('famous/core/Surface');
     var StateModifier = require('famous/modifiers/StateModifier');
     var CarouselView = require('./views/CarouselView');
+    // var ScrollItemView = require('./views/ScrollItemView');
+    var OptionsView = require('./views/OptionsView');
+    var AppView = require('./views/AppView');
     var Utility = require('famous/utilities/Utility');
     var Transform = require('famous/core/Transform');
 
     var mainContext = Engine.createContext();
-    var surfaces = [];
+    var scrollItemViews = [];
+    var appView = new AppView();
+    var optionsView = new OptionsView();
+    var optionsModifier = new StateModifier({
+        size: [undefined,200],
+        origin: [0,1]
+    })
 
-    var createSurfaceArray = function (num, size) {
-        for (var i = 0; i < num; i += 1) {
-            var color = "hsl(" + (i * 360 / 10) + ", 100%, 50%)";
-            var surface = new Surface({
-                content: '<p style="text-align: center;">Are you Famo.us?</p>',
-                size: [size, size],
-                properties: {
-                    backgroundColor: color
-                }
-            });
-            surfaces.push(surface);
-            carousel.subscribe(surface);
-        }
-    };
 
-    var carousel = new CarouselView({
-        startDamp: 0.5,
-        endDamp: 0.3,
-        startPeriod: 100,
-        endPeriod: 1000,
-        rotateRadian: Math.PI / 2,
-        maxVelocity: 10,
-        lowerBound: 0.25,
-        upperBound: 0.5,
-        endDepth: 200
-    });
-
-    var carouselModifier = new StateModifier({
-        origin: [0, 0.5]
-    });
-
-    createSurfaceArray(100, 150);
-    carousel.sequenceFrom(surfaces);
+    optionsView.pipe(appView);
 
     mainContext.setPerspective(500);
-    mainContext.add(carouselModifier).add(carousel);
+    mainContext.add(appView);
+    mainContext.add(optionsModifier).add(optionsView);
 });
