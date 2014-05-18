@@ -1,91 +1,98 @@
-// options
-
 /*globals define*/
 define(function(require, exports, module) {
     var View = require('famous/core/View');
     var Surface = require('famous/core/Surface');
     var Transform = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
-    var CarouselView = require('./CarouselView');
-    // var ScrollItemView = require('./ScrollItemView');
-
 
     /*
-     * @name AppView
+     * @name OptionsView
      * @constructor
      * @description
      */
 
-    function AppView() {
+    function OptionsView() {
         View.apply(this, arguments);
-        createScrollView.call(this);
-        _setListeners.call(this);
-        this.depthCount = 1;
+        this.createSurfaces.call(this);
+        this._setListeners.call(this);
     }
 
-    AppView.prototype = Object.create(View.prototype);
-    AppView.prototype.constructor = AppView;
+    OptionsView.prototype = Object.create(View.prototype);
+    OptionsView.prototype.constructor = OptionsView;
 
-
-    AppView.DEFAULT_OPTIONS = {
+    OptionsView.DEFAULT_OPTIONS = {
+    };
+    OptionsView.prototype.createSurfaces = function() {
+        var surfaceMain = new Surface({
+            size: [undefined, 200],
+            content: 'hello',
+            properties: {
+                backgroundColor: 'gray',
+                opacity: 0.5
+            }
+        });
+        this.depthButton = new Surface({
+            size: [100,100],
+            content: 'give me depth',
+            properties: {
+                backgroundColor: 'green'
+            }
+        })
+        var depthButtonModifier = new StateModifier({
+            origin: [0., 0]
+        })
+        this.swivelButton = new Surface({
+            size: [100,100],
+            content: 'swivel me',
+            properties: {
+                backgroundColor: 'blue'
+            }
+        })
+        var swivelButtonModifier = new StateModifier({
+            origin: [0, 1]
+        })
+        this.bounceButton = new Surface({
+            size: [100,100],
+            content: 'bounce me',
+            properties: {
+                backgroundColor: 'orange'
+            }
+        })
+        var bounceButtonModifier = new StateModifier({
+            origin: [1, 0]
+        })
+        this.fadeButton = new Surface({
+            size: [100,100],
+            content: 'fade me',
+            properties: {
+                backgroundColor: 'yellow'
+            }
+        })
+        var fadeButtonModifier = new StateModifier({
+            origin: [1, 1]
+        })
+        var main = this.add(surfaceMain);
+        this.add(depthButtonModifier).add(this.depthButton);
+        this.add(swivelButtonModifier).add(this.swivelButton);
+        this.add(bounceButtonModifier).add(this.bounceButton);
+        this.add(fadeButtonModifier).add(this.fadeButton);
     };
 
-    function createScrollView(options) {
-        var scrollItemViews = [];
-        options = options ||
-        {
-            lowerBound: 0.3,
-            upperBound: 0.7,
-            rotateRadian: null
-        };
-        var createScrollItemArray = function (num, size) {
-            for (var i = 0; i < num; i += 1) {
-                var scrollItemView = new Surface({
-                    content: "<img src='../content/images/picasso.jpeg' height='" + size + "' width='" + size + "'>",
-                    size: [size, size]
-                });
-                scrollItemViews.push(scrollItemView);
-                this.carousel.subscribe(scrollItemView);
-            }
-        }.bind(this);
-        this.carousel = new CarouselView(options);
-        this.carouselModifier = new StateModifier({
-            origin: [0, 0.5]
-        });
-
-        createScrollItemArray(100, 150);
-        this.carousel.sequenceFrom(scrollItemViews);
-
-        this.add(this.carouselModifier).add(this.carousel);
-    }
-
-    function _setListeners() {
-
-        this._eventInput.on('fade', function() {
-            this.carousel.setOptions({
-                startFade: 0.5,
-                endFade: 1
-            });
+    OptionsView.prototype._setListeners = function() {
+        this.depthButton.on('click', function() {
+            this._eventOutput.emit('depth');
+        }.bind(this));
+        this.swivelButton.on('click', function() {
+            this._eventOutput.emit('swivel');
+        }.bind(this));
+        this.bounceButton.on('click', function() {
+            this._eventOutput.emit('bounce');
+        }.bind(this));
+        this.fadeButton.on('click', function() {
+            console.log('fade');
+            this._eventOutput.emit('fade');
         }.bind(this));
 
-        this._eventInput.on('depth', function() {
-            this.depthCount = this.depthCount + 100;
-            this.carousel.setOptions({endDepth:this.depthCount});
-        }.bind(this));
-
-        this._eventInput.on('swivel', function() {
-            this.carousel.setOptions({rotateRadian: Math.PI / 2});
-        }.bind(this));
-
-        this._eventInput.on('bounce', function() {
-            this.carousel.setOptions({
-                edgeDamp: 0.1,
-                edgePeriod: 1000
-            });
-
-        }.bind(this));
-
-    }
-
-    module.exports = AppView;
+    };
+    module.exports = OptionsView;
 });
