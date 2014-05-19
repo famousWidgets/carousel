@@ -38,7 +38,7 @@ define(function(require, exports, module) {
         var createScrollItemArray = function (num, size) {
             for (var i = 0; i < num; i += 1) {
                 var scrollItemView = new Surface({
-                    content: "<img src='../content/images/picasso.jpeg' height='" + size + "' width='" + size + "'>",
+                    content: '<div class="agMovie agMovie-lulg mr125"><span id="dbs60031236_0" class="boxShot boxShot-166 queueable  hoverPlay  bobbable vbox_60031236"><img class="boxShotImg hideBobBoxshot" alt="Kill Bill: Vol. 1" src="http://cdn9.nflximg.net/webp/3419/3993419.webp"><a id="b060031236_0" class="bobbable popLink hideBobBoxshot playLink full" href="http://www.netflix.com/WiPlayer?movieid=60031236&amp;trkid=13462293&amp;tctx=2%2C3%2Cc43357f0-c453-4f5b-bb5b-f9afaadbb4c9-1811849" data-uitrack="60031236,13462293,2,3">&nbsp;</a></span></div>',
                     size: [size, size]
                 });
                 scrollItemViews.push(scrollItemView);
@@ -47,7 +47,7 @@ define(function(require, exports, module) {
         }.bind(this);
         this.carousel = new CarouselView(options);
         this.carouselModifier = new StateModifier({
-            origin: [0, 0.5]
+            origin: [0, 0.3]
         });
 
         createScrollItemArray(100, 150);
@@ -60,14 +60,14 @@ define(function(require, exports, module) {
 
         this._eventInput.on('fade', function() {
             this.carousel.setOptions({
-                startFade: 0.5,
-                endFade: 1
+                minOpacity: 0.5,
+                maxOpacity: 1
             });
         }.bind(this));
 
         this._eventInput.on('depth', function() {
             this.depthCount = this.depthCount + 100;
-            this.carousel.setOptions({endDepth:this.depthCount});
+            this.carousel.setOptions({maxDepth:this.depthCount});
         }.bind(this));
 
         this._eventInput.on('swivel', function() {
